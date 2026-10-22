@@ -1,64 +1,136 @@
 // ============================================
-// VISTAAR API Service Abstraction Layer
-// Replace mock implementations with real API calls
-// when connecting to Spring Boot / FastAPI backend
+// VISTAAR API Service Layer
+// Connects frontend to teammate's FastAPI backend
+// Endpoints:
+//   - POST /upload (multipart/form-data: file)
+//   - POST /ask    (JSON: { question: string })
+//   - GET  /       (backend root/health)
 // ============================================
 
 import { mockDocuments, mockImages, mockConversations, mockKnowledgeGraph, mockInsights } from '../data/mockData'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+// Base URL configured from environment variable or defaults to Vite proxy '/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
-// Simulated network delay
-const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms))
+/**
+ * Check if the FastAPI backend is running and reachable.
+ */
+export async function checkBackendHealth() {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 4000)
+    const res = await fetch(`${API_BASE_URL}/`, {
+      method: 'GET',
+      signal: controller.signal,
+    })
+    clearTimeout(timeoutId)
+    return { online: res.ok, status: res.status }
+  } catch (err) {
+    return { online: false, error: err.message }
+  }
+}
 
 // ============================================
 // Document Service
 // ============================================
 export const documentService = {
+  checkHealth: checkBackendHealth,
+
+  /**
+   * Upload a document (PDF or text) to the backend FAISS index.
+   * Endpoint: POST /upload
+   * Rate limit: 5/minute
+   */
+  async upload(file) {
+    if (!file) {
+      throw new Error('Please select a file to upload.')
+    }
+
+    // Supported formats check according to backend ingestion capability
+    const fileName = file.name.toLowerCase()
+    const isPdf = fileName.endsWith('.pdf')
+    const isTxt = fileName.endsWith('.txt') || fileName.endsWith('.md') || fileName.endsWith('.json') || fileName.endsWith('.csv')
+    const isSupported = isPdf || isTxt
+
+    if (!isSupported && !file.type.includes('image')) {
+      throw new Error('The backend currently supports PDF and text files (.pdf, .txt). Please upload a supported format.')
+    }
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    let res
+    try {
+      res = await fetch(`${API_BASE_URL}/upload`, {
+        method: 'POST',
+        body: formData,
+      })
+    } catch (networkErr) {
+      throw new Error(
+        `Failed to reach VISTAAR backend at "${API_BASE_URL}/upload". Ensure the FastAPI backend is running on http://127.0.0.1:8000.`
+      )
+    }
+
+    if (res.status === 429) {
+      throw new Error('Upload rate limit exceeded (5 uploads per minute). Please wait a moment before trying again.')
+    }
+
+    if (!res.ok) {
+      let errDetail = `Server error HTTP ${res.status}`
+      try {
+        const errorJson = await res.json()
+        if (errorJson.detail) errDetail = errorJson.detail
+      } catch {
+        // ignore JSON parse error on non-json error responses
+      }
+      throw new Error(errDetail)
+    }
+
+    const data = await res.json()
+
+    // Backend returns: {"message": "PDF text not readable. Try another file."}
+    if (data.message && data.message.toLowerCase().includes('not readable')) {
+      throw new Error(data.message)
+    }
+
+    // Successfully scheduled for background ingestion
+    return {
+      success: true,
+      message: data.message,
+      document: {
+        id: `doc-${Date.now()}`,
+        name: file.name,
+        type: isPdf ? 'pdf' : file.type.includes('image') ? 'image' : 'text',
+        size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+        uploadedAt: 'Just now',
+        status: 'Indexed in FAISS',
+        backendMessage: data.message,
+      },
+    }
+  },
+
   async getAll() {
-    await delay(300)
     return [...mockDocuments, ...mockImages]
   },
 
   async getDocuments() {
-    await delay(300)
     return mockDocuments
   },
 
   async getImages() {
-    await delay(300)
     return mockImages
   },
 
   async getById(id) {
-    await delay(200)
     const allFiles = [...mockDocuments, ...mockImages]
     return allFiles.find(f => f.id === id) || null
   },
 
-  async upload(file) {
-    await delay(1500)
-    // In production: POST to ${API_BASE_URL}/documents/upload
-    return {
-      id: `doc-${Date.now()}`,
-      name: file.name,
-      type: file.type.includes('image') ? 'image' : 'pdf',
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      uploadedAt: 'Just now',
-      tags: [],
-      chunks: 0,
-      pages: 0,
-    }
-  },
-
   async delete(id) {
-    await delay(300)
-    // In production: DELETE ${API_BASE_URL}/documents/${id}
     return { success: true }
   },
 
   async getAnalysis(id) {
-    await delay(800)
     const doc = [...mockDocuments, ...mockImages].find(f => f.id === id)
     return doc ? {
       summary: doc.summary,
@@ -74,33 +146,65 @@ export const documentService = {
 // Chat / RAG Service
 // ============================================
 export const chatService = {
+  /**
+   * Submit a question to the backend RAG pipeline.
+   * Endpoint: POST /ask
+   * Rate limit: 10/minute
+   * Body: { question: string }
+   * Response: { answer: string }
+   */
+  async askQuestion(question) {
+    const trimmed = question?.trim()
+    if (!trimmed) {
+      throw new Error('Please enter a question.')
+    }
+
+    let res
+    try {
+      res = await fetch(`${API_BASE_URL}/ask`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: trimmed }),
+      })
+    } catch (networkErr) {
+      throw new Error(
+        `Failed to reach VISTAAR backend at "${API_BASE_URL}/ask". Ensure the FastAPI backend is running on http://127.0.0.1:8000.`
+      )
+    }
+
+    if (res.status === 429) {
+      throw new Error('Question rate limit exceeded (10 questions per minute). Please wait a moment before asking again.')
+    }
+
+    if (!res.ok) {
+      let errDetail = `Server error HTTP ${res.status}`
+      try {
+        const errorJson = await res.json()
+        if (errorJson.detail) errDetail = errorJson.detail
+      } catch {
+        // ignore
+      }
+      throw new Error(errDetail)
+    }
+
+    const data = await res.json()
+    return {
+      answer: data.answer,
+      timestamp: new Date().toISOString(),
+    }
+  },
+
   async getConversations() {
-    await delay(300)
     return mockConversations
   },
 
   async getConversation(id) {
-    await delay(200)
     return mockConversations.find(c => c.id === id) || null
   },
 
-  async sendMessage(conversationId, message, sourceIds = []) {
-    await delay(1500)
-    // In production: POST ${API_BASE_URL}/chat/ask
-    // Body: { conversationId, message, sourceIds }
-    return {
-      id: `msg-${Date.now()}`,
-      role: 'assistant',
-      content: `Based on your uploaded documents, here's what I found:\n\n${message.length > 50 ? 'This is a detailed analysis based on the retrieved context from your documents. The information has been synthesized from multiple sources to provide a comprehensive answer.' : 'I analyzed your documents and found relevant information related to your query. Let me provide a grounded response based on the retrieved evidence.'}`,
-      sources: [
-        { docId: 'doc-1', name: 'RAG_Research_Paper.pdf', page: 4, relevance: 85, type: 'pdf' },
-        { docId: 'doc-2', name: 'System_Design_Notes.pdf', page: 12, relevance: 72, type: 'pdf' },
-      ],
-    }
-  },
-
   async createConversation() {
-    await delay(200)
     return {
       id: `conv-${Date.now()}`,
       title: 'New Conversation',
@@ -112,15 +216,15 @@ export const chatService = {
 
 // ============================================
 // Knowledge Graph Service
+// Note: Backend does not currently provide graph extraction endpoint;
+// this module provides client-side exploration visualization.
 // ============================================
 export const knowledgeGraphService = {
   async getGraph() {
-    await delay(500)
     return mockKnowledgeGraph
   },
 
   async getNodeDetails(nodeId) {
-    await delay(300)
     const node = mockKnowledgeGraph.nodes.find(n => n.id === nodeId)
     return node || null
   },
@@ -131,17 +235,16 @@ export const knowledgeGraphService = {
 // ============================================
 export const insightsService = {
   async getInsights() {
-    await delay(400)
     return mockInsights
   },
 }
 
 // ============================================
 // Image Intelligence Service
+// Note: Backend currently focuses on PDF/text RAG.
 // ============================================
 export const imageService = {
   async analyzeImage(imageId) {
-    await delay(1000)
     const img = mockImages.find(i => i.id === imageId)
     return img ? {
       detectedText: img.detectedText,
@@ -151,9 +254,8 @@ export const imageService = {
   },
 
   async askAboutImage(imageId, question) {
-    await delay(1200)
     return {
-      answer: 'Based on my analysis of the image, I can see the following relevant information...',
+      answer: 'Visual analysis feature is currently exploring OCR models. For grounded answers, please query uploaded text or PDF documents.',
       confidence: 0.82,
     }
   },

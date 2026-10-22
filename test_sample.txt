@@ -1,0 +1,13 @@
+VISTAAR Platform Documentation and System Guide
+
+1. Overview
+VISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.
+
+2. Ingestion and Indexing
+When documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.
+
+3. Query Retrieval and Generation
+When a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'
+
+4. System Constraints
+The upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.

@@ -8,11 +8,11 @@ import EmptyState from '../components/EmptyState'
 export default function KnowledgeSpace() {
   const [filter, setFilter] = useState('all') // 'all' | 'documents' | 'images'
   const [searchQuery, setSearchQuery] = useState('')
-  const { setUploadModal } = useApp()
+  const { setUploadModal, uploadedDocuments } = useApp()
 
   const allFiles = useMemo(() => {
-    return [...mockDocuments, ...mockImages]
-  }, [])
+    return [...(uploadedDocuments || []), ...mockDocuments, ...mockImages]
+  }, [uploadedDocuments])
 
   const filteredFiles = useMemo(() => {
     return allFiles.filter((file) => {

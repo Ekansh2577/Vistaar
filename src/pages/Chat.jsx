@@ -2,23 +2,25 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import {
   MessageSquare, Plus, Send, Paperclip, FileText, Image as ImageIcon,
-  CheckCircle, Sparkles, ExternalLink, ArrowRight, CornerDownLeft, ShieldCheck
+  CheckCircle, Sparkles, ExternalLink, ArrowRight, CornerDownLeft, ShieldCheck,
+  AlertCircle, RefreshCw, Upload
 } from 'lucide-react'
 import { mockConversations, mockDocuments, mockImages } from '../data/mockData'
 import { useApp } from '../context/AppContext'
+import { chatService } from '../services/api'
 
 export default function Chat() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { setUploadModal } = useApp()
+  const { setUploadModal, uploadedDocuments, backendOnline, checkBackendStatus } = useApp()
 
   const [conversations, setConversations] = useState(mockConversations)
   const [activeConvId, setActiveConvId] = useState('conv-1')
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   
-  // Mixed sources filter (PDFs and Images selected for chat context)
-  const [selectedSourceIds, setSelectedSourceIds] = useState(['doc-1', 'doc-2', 'img-2'])
+  // Mixed sources filter
+  const [selectedSourceIds, setSelectedSourceIds] = useState(['doc-1', 'doc-2'])
   const [evidencePanelOpen, setEvidencePanelOpen] = useState(true)
 
   const messagesEndRef = useRef(null)
@@ -26,8 +28,16 @@ export default function Chat() {
   // Current conversation
   const currentConv = conversations.find((c) => c.id === activeConvId) || conversations[0]
 
-  // Available sources pool
-  const allAvailableSources = [...mockDocuments, ...mockImages]
+  // Available sources pool (includes uploaded session documents)
+  const allAvailableSources = [
+    ...(uploadedDocuments || []).map(d => ({
+      ...d,
+      tags: ['Uploaded', 'FAISS Indexed'],
+      summary: d.backendMessage || 'Indexed into FAISS vector database.',
+    })),
+    ...mockDocuments,
+    ...mockImages
+  ]
 
   // Handle incoming query param ?q=
   useEffect(() => {
@@ -42,9 +52,9 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [currentConv?.messages, isTyping])
 
-  const handleSendMessage = (messageText) => {
+  const handleSendMessage = async (messageText) => {
     const text = (messageText || inputMessage).trim()
-    if (!text) return
+    if (!text || isTyping) return
 
     const userMsg = {
       id: `msg-${Date.now()}`,
@@ -53,7 +63,7 @@ export default function Chat() {
       sources: [],
     }
 
-    // Add user message
+    // Add user message to active conversation
     setConversations((prev) =>
       prev.map((c) => {
         if (c.id === activeConvId) {
@@ -70,32 +80,29 @@ export default function Chat() {
     if (!messageText) setInputMessage('')
     setIsTyping(true)
 
-    // Simulate RAG retrieval & generation delay
-    setTimeout(() => {
-      // Build dynamic context-aware answer
-      let answerContent = ''
-      let sources = []
+    try {
+      // Call actual FastAPI backend endpoint: POST /ask
+      const response = await chatService.askQuestion(text)
 
-      if (text.toLowerCase().includes('sort') || text.toLowerCase().includes('dsa') || text.toLowerCase().includes('image')) {
-        answerContent = `Based on your uploaded image **DSA_Notes.jpg** and **Architecture_Diagram.png**:\n\n- **Algorithm Structure:** The handwritten notes define Quick Sort using a divide-and-conquer strategy with recursive partitioning.\n- **Pivot Selection:** Crucial for avoiding O(n²) worst-case degradation. Choosing median-of-three yields average O(n log n) runtime.\n- **Visual Trace:** The partitioned arrays in the diagram show elements smaller than the pivot shifted left, and larger elements shifted right.`
-        sources = [
-          { docId: 'img-1', name: 'DSA_Notes.jpg', page: 1, relevance: 94, type: 'image', textSnippet: 'Quick Sort algorithm step-by-step pivot selection and partition logic.' },
-          { docId: 'img-2', name: 'Architecture_Diagram.png', page: 1, relevance: 78, type: 'image', textSnippet: 'Vector search flow into LLM context augmentation.' }
-        ]
-      } else {
-        answerContent = `According to your indexed knowledge base:\n\n1. **Core Concept:** Retrieval Augmented Generation (RAG) grounds language models in external authoritative documents before generating completions, eliminating hallucinations.\n2. **Retrieval Mechanism:** Documents are partitioned into dense chunks, embedded using transformer models, and queried through vector similarity indices like FAISS.\n3. **Multi-Source Synthesis:** Both structured documentation and diagrammatic visuals are retrieved concurrently to form an evidence-backed synthesized response.`
-        sources = [
-          { docId: 'doc-1', name: 'RAG_Research_Paper.pdf', page: 4, relevance: 88, type: 'pdf', textSnippet: 'RAG combines pre-trained parametric memory with non-parametric dense vector index representations.' },
-          { docId: 'doc-2', name: 'System_Design_Notes.pdf', page: 12, relevance: 76, type: 'pdf', textSnippet: 'High-availability vector database deployment and caching strategies.' },
-          { docId: 'doc-6', name: 'Data_Science_Handbook.pdf', page: 27, relevance: 64, type: 'pdf', textSnippet: 'Statistical evaluation of retrieval accuracy and precision-recall trade-offs.' }
-        ]
-      }
+      // Check if backend returned empty retrieval notice
+      const isUnindexed = response.answer?.includes('Please upload a document first') ||
+                          response.answer?.includes('No relevant information found')
 
       const assistantMsg = {
         id: `msg-${Date.now() + 1}`,
         role: 'assistant',
-        content: answerContent,
-        sources,
+        content: response.answer,
+        isUnindexedNotice: isUnindexed,
+        sources: (uploadedDocuments && uploadedDocuments.length > 0)
+          ? uploadedDocuments.map(d => ({
+              docId: d.id,
+              name: d.name,
+              page: 1,
+              relevance: 90,
+              type: d.type === 'pdf' ? 'pdf' : 'text',
+              textSnippet: 'Indexed into backend FAISS vector index (Top-8 retrieval).',
+            }))
+          : [],
       }
 
       setConversations((prev) =>
@@ -109,8 +116,30 @@ export default function Chat() {
           return c
         })
       )
+    } catch (err) {
+      // Graceful error state directly in conversation
+      const errorMsg = {
+        id: `msg-${Date.now() + 1}`,
+        role: 'assistant',
+        isError: true,
+        content: `⚠️ Error contacting VISTAAR backend:\n\n${err.message}\n\nPlease verify that the FastAPI backend server is running on http://127.0.0.1:8000 and has GEMINI_API_KEY configured.`,
+        sources: [],
+      }
+
+      setConversations((prev) =>
+        prev.map((c) => {
+          if (c.id === activeConvId) {
+            return {
+              ...c,
+              messages: [...c.messages, errorMsg],
+            }
+          }
+          return c
+        })
+      )
+    } finally {
       setIsTyping(false)
-    }, 1200)
+    }
   }
 
   const handleNewChat = () => {
@@ -130,14 +159,6 @@ export default function Chat() {
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     )
   }
-
-  // Active sources list from latest assistant message
-  const latestAssistantMessage = [...(currentConv?.messages || [])].reverse().find((m) => m.role === 'assistant')
-  const activeEvidenceSources = latestAssistantMessage?.sources || [
-    { docId: 'doc-1', name: 'RAG_Research_Paper.pdf', page: 4, relevance: 85, type: 'pdf', textSnippet: 'RAG combines retrieval with language generation to reduce factual hallucinations.' },
-    { docId: 'doc-2', name: 'System_Design_Notes.pdf', page: 12, relevance: 72, type: 'pdf', textSnippet: 'Microservices architecture for decoupled vector indexing.' },
-    { docId: 'doc-6', name: 'Data_Science_Handbook.pdf', page: 27, relevance: 61, type: 'pdf', textSnippet: 'Evaluation metrics for dense retrieval models.' },
-  ]
 
   const handleOpenSource = (source) => {
     if (source.type === 'image') {
@@ -172,41 +193,46 @@ export default function Chat() {
 
           <div style={{ marginTop: '24px', padding: '12px', borderTop: '1px solid var(--border-secondary)' }}>
             <div className="chat-sidebar-section-title" style={{ padding: '0 0 8px 0' }}>
-              Selected Sources ({selectedSourceIds.length})
+              Knowledge Base Context
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {allAvailableSources.slice(0, 4).map((src) => {
-                const isChecked = selectedSourceIds.includes(src.id)
-                return (
+            
+            {uploadedDocuments && uploadedDocuments.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {uploadedDocuments.map((doc) => (
                   <div
-                    key={src.id}
-                    onClick={() => toggleSourceSelection(src.id)}
+                    key={doc.id}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
                       padding: '6px 8px',
                       borderRadius: 'var(--radius-sm)',
-                      background: isChecked ? 'var(--primary-50)' : 'transparent',
-                      cursor: 'pointer',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.25)',
                       fontSize: '0.78rem',
-                      color: isChecked ? 'var(--primary-700)' : 'var(--text-secondary)',
-                      transition: 'all 0.15s ease'
+                      color: 'var(--text-primary)',
                     }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => {}}
-                      style={{ cursor: 'pointer' }}
-                    />
+                    <CheckCircle size={14} style={{ color: '#10b981', flexShrink: 0 }} />
                     <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {src.name}
+                      {doc.name}
                     </span>
                   </div>
-                )
-              })}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', lineHeight: 1.4 }}>
+                No custom files uploaded yet. Backend FAISS vector store is empty.
+              </div>
+            )}
+
+            <button
+              className="btn btn-secondary btn-sm"
+              style={{ width: '100%', marginTop: '12px', fontSize: '0.75rem' }}
+              onClick={() => setUploadModal(true)}
+            >
+              <Upload size={13} /> Upload Document
+            </button>
           </div>
         </div>
       </aside>
@@ -217,11 +243,67 @@ export default function Chat() {
           <div>
             <div className="chat-main-title">{currentConv?.title || 'Chat Workspace'}</div>
             <div className="chat-main-subtitle">
-              Grounding queries across {selectedSourceIds.length} active documents & images
+              FastAPI RAG Pipeline • FAISS Dense Retrieval (Top-8) • Gemini Context Grounding
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* Backend Connectivity Status Pill */}
+            <div
+              onClick={checkBackendStatus}
+              title="Click to check backend status"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 10px',
+                borderRadius: '999px',
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                background:
+                  backendOnline === true
+                    ? 'rgba(16, 185, 129, 0.12)'
+                    : backendOnline === false
+                    ? 'rgba(239, 68, 68, 0.12)'
+                    : 'rgba(245, 158, 11, 0.12)',
+                color:
+                  backendOnline === true
+                    ? '#10b981'
+                    : backendOnline === false
+                    ? '#ef4444'
+                    : '#f59e0b',
+                border: `1px solid ${
+                  backendOnline === true
+                    ? 'rgba(16, 185, 129, 0.3)'
+                    : backendOnline === false
+                    ? 'rgba(239, 68, 68, 0.3)'
+                    : 'rgba(245, 158, 11, 0.3)'
+                }`,
+              }}
+            >
+              <span
+                style={{
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background:
+                    backendOnline === true
+                      ? '#10b981'
+                      : backendOnline === false
+                      ? '#ef4444'
+                      : '#f59e0b',
+                }}
+              />
+              <span>
+                {backendOnline === true
+                  ? 'Backend Connected'
+                  : backendOnline === false
+                  ? 'Backend Offline'
+                  : 'Checking Backend'}
+              </span>
+            </div>
+
             <button
               className="btn btn-secondary btn-sm"
               onClick={() => setEvidencePanelOpen(!evidencePanelOpen)}
@@ -233,13 +315,19 @@ export default function Chat() {
 
         {/* Selected Sources Context Pills */}
         <div style={{ padding: '8px 28px', borderBottom: '1px solid var(--border-secondary)', background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)' }}>Context Pool:</span>
-          {allAvailableSources.filter(s => selectedSourceIds.includes(s.id)).map(s => (
-            <span key={s.id} className="source-chip" style={{ fontSize: '0.72rem', padding: '2px 10px' }}>
-              <span className="source-chip-icon">{s.type === 'image' ? '🖼' : '📄'}</span>
-              <span>{s.name}</span>
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)' }}>Indexed Target:</span>
+          {uploadedDocuments && uploadedDocuments.length > 0 ? (
+            uploadedDocuments.map(s => (
+              <span key={s.id} className="source-chip" style={{ fontSize: '0.72rem', padding: '2px 10px', background: 'rgba(16, 185, 129, 0.15)', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+                <span className="source-chip-icon">📄</span>
+                <span>{s.name} (Active in FAISS)</span>
+              </span>
+            ))
+          ) : (
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+              No document uploaded yet. Click "Upload Knowledge" to index a PDF or TXT file into FAISS.
             </span>
-          ))}
+          )}
         </div>
 
         {/* Messages Scroll Container */}
@@ -249,28 +337,29 @@ export default function Chat() {
               <div className="empty-state-icon">
                 <Sparkles size={32} style={{ color: 'var(--primary-600)' }} />
               </div>
-              <h3 className="empty-state-title">Ask anything about your knowledge</h3>
+              <h3 className="empty-state-title">Ask anything about your documents</h3>
               <p className="empty-state-desc">
-                Ask questions across documents and images. VISTAAR will cross-reference text, code, charts, and diagrams to deliver verified answers.
+                Submit natural language questions to the VISTAAR FastAPI backend. The system will retrieve relevant chunks via FAISS vector similarity search and generate grounded answers using Gemini.
               </p>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <button
                   className="quick-action-chip"
-                  onClick={() => handleSendMessage('What is Retrieval Augmented Generation (RAG)?')}
+                  onClick={() => handleSendMessage('What is the main topic of the uploaded document?')}
                 >
-                  What is RAG?
+                  What is the document about?
                 </button>
                 <button
                   className="quick-action-chip"
-                  onClick={() => handleSendMessage('Explain the Quick Sort algorithm in DSA_Notes.jpg')}
+                  onClick={() => handleSendMessage('Summarize the key findings.')}
                 >
-                  Explain Quick Sort notes
+                  Summarize key findings
                 </button>
                 <button
                   className="quick-action-chip"
-                  onClick={() => handleSendMessage('How does the RAG architecture diagram connect to embeddings?')}
+                  onClick={() => setUploadModal(true)}
                 >
-                  Analyze architecture diagram
+                  <Upload size={13} style={{ display: 'inline', marginRight: '4px' }} />
+                  Upload new PDF/TXT
                 </button>
               </div>
             </div>
@@ -281,33 +370,51 @@ export default function Chat() {
                   {msg.role === 'user' ? 'EK' : <Sparkles size={16} />}
                 </div>
                 <div className="chat-message-content">
-                  <div className="chat-message-bubble">
+                  <div
+                    className="chat-message-bubble"
+                    style={
+                      msg.isError
+                        ? { background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.25)', color: 'var(--text-primary)' }
+                        : undefined
+                    }
+                  >
                     {msg.content.split('\n').map((paragraph, idx) => (
                       <p key={idx} style={{ marginBottom: idx === msg.content.split('\n').length - 1 ? 0 : '8px' }}>
                         {paragraph}
                       </p>
                     ))}
+
+                    {msg.isUnindexedNotice && (
+                      <div style={{ marginTop: '12px' }}>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => setUploadModal(true)}
+                        >
+                          <Upload size={14} /> Upload a Document Now
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Inline Source Chips */}
+                  {/* Inline Source Chips when backend provides references */}
                   {msg.sources && msg.sources.length > 0 && (
                     <div className="chat-message-sources">
                       <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-tertiary)', alignSelf: 'center' }}>
-                        Grounding Sources:
+                        Target Document:
                       </span>
                       {msg.sources.map((src, idx) => (
                         <div
                           key={idx}
                           className="chat-source-card"
-                          onClick={() => handleOpenSource(src)}
+                          onClick={() => {}}
                         >
                           <div className={`chat-source-icon ${src.type === 'image' ? 'img' : 'pdf'}`}>
-                            {src.type === 'image' ? '🖼' : '📄'}
+                            📄
                           </div>
                           <div>
                             <div className="chat-source-name">{src.name}</div>
                             <div className="chat-source-page">
-                              {src.type === 'image' ? 'Visual OCR' : `Page ${src.page}`} • {src.relevance}% relevant
+                              FAISS In-Memory Index • Top-8 Chunks
                             </div>
                           </div>
                         </div>
@@ -332,7 +439,7 @@ export default function Chat() {
                     <div className="loading-pulse-dot" />
                   </div>
                   <span style={{ fontSize: '0.82rem', color: 'var(--text-tertiary)' }}>
-                    Searching vector embeddings & verifying evidence...
+                    Searching FAISS vector index & querying Gemini...
                   </span>
                 </div>
               </div>
@@ -352,7 +459,7 @@ export default function Chat() {
             className="chat-input-wrapper"
           >
             <textarea
-              placeholder="Ask a question about your documents, notes or images (Press Enter to send)..."
+              placeholder="Ask a question about your uploaded documents (Press Enter to send)..."
               value={inputMessage}
               rows={1}
               onChange={(e) => setInputMessage(e.target.value)}
@@ -390,45 +497,65 @@ export default function Chat() {
       {evidencePanelOpen && (
         <aside className="chat-sources-panel">
           <div className="chat-sources-header">
-            <div className="chat-sources-title">Verified Evidence</div>
+            <div className="chat-sources-title">Backend Evidence & Context</div>
             <div className="chat-sources-subtitle">
-              Ground truth extracted from selected knowledge assets
+              Ground truth retrieved by FAISS vector index
             </div>
           </div>
 
           <div className="chat-sources-list">
-            {activeEvidenceSources.map((ev, i) => (
-              <div
-                key={i}
-                className="evidence-card"
-                onClick={() => handleOpenSource(ev)}
-              >
-                <div className="evidence-card-header">
-                  <div className={`evidence-card-icon ${ev.type === 'image' ? 'img' : 'pdf'}`}>
-                    {ev.type === 'image' ? '🖼' : '📄'}
-                  </div>
-                  <div>
-                    <div className="evidence-card-name">{ev.name}</div>
-                    <div className="evidence-card-page">
-                      {ev.type === 'image' ? 'Visual Region #1' : `Page ${ev.page || 1}`}
+            {uploadedDocuments && uploadedDocuments.length > 0 ? (
+              uploadedDocuments.map((doc, i) => (
+                <div key={i} className="evidence-card">
+                  <div className="evidence-card-header">
+                    <div className="evidence-card-icon pdf">
+                      📄
+                    </div>
+                    <div>
+                      <div className="evidence-card-name">{doc.name}</div>
+                      <div className="evidence-card-page">
+                        {doc.size} • Ingestion Status: Indexed
+                      </div>
+                    </div>
+                    <div className="evidence-card-relevance">
+                      <span className="relevance-badge high">
+                        Active
+                      </span>
                     </div>
                   </div>
-                  <div className="evidence-card-relevance">
-                    <span className={`relevance-badge ${ev.relevance >= 80 ? 'high' : 'medium'}`}>
-                      {ev.relevance}%
-                    </span>
+
+                  <div className="evidence-card-text">
+                    "Chunks stored in FAISS IndexFlatL2 (384-dim all-MiniLM-L6-v2 embeddings). The backend retrieves top-8 chunks for each query and logs preview matches to the server console."
                   </div>
                 </div>
-
-                <div className="evidence-card-text">
-                  "{ev.textSnippet || 'Retrieved semantic segment matched high-dimensional cosine similarity score above relevance threshold.'}"
-                </div>
-
-                <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', fontSize: '0.75rem', color: 'var(--primary-600)', fontWeight: 500 }}>
-                  View passage <ExternalLink size={12} />
-                </div>
+              ))
+            ) : (
+              <div style={{ padding: '20px 16px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>
+                <div style={{ marginBottom: '10px', fontSize: '1.5rem' }}>📂</div>
+                <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>No Documents Indexed Yet</div>
+                <p style={{ lineHeight: 1.5, fontSize: '0.8rem', margin: '0 0 16px 0' }}>
+                  Upload a PDF or TXT file to populate the backend FAISS index and observe retrieved context.
+                </p>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setUploadModal(true)}
+                  style={{ width: '100%' }}
+                >
+                  <Upload size={14} /> Upload Knowledge
+                </button>
               </div>
-            ))}
+            )}
+
+            <div style={{ marginTop: '16px', padding: '12px 14px', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>Backend RAG Architecture:</div>
+              <ul style={{ margin: 0, paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <li>Chunk size: 1000 chars (200 char overlap)</li>
+                <li>Embedding model: all-MiniLM-L6-v2</li>
+                <li>Search: Exact FAISS L2 Euclidean distance</li>
+                <li>Retrieval: Top K = 8 chunks</li>
+                <li>Generation: Gemini with strict context prompt</li>
+              </ul>
+            </div>
           </div>
         </aside>
       )}

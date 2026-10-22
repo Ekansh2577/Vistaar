@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { checkBackendHealth } from '../services/api'
 
 const AppContext = createContext()
 
@@ -6,6 +7,15 @@ export function AppProvider({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [toasts, setToasts] = useState([])
   const [uploadModal, setUploadModal] = useState(false)
+  const [uploadedDocuments, setUploadedDocuments] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vistaar_session_docs')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+  const [backendOnline, setBackendOnline] = useState(null) // null = checking, true = online, false = offline
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev)
   const closeSidebar = () => setSidebarOpen(false)
@@ -15,18 +25,44 @@ export function AppProvider({ children }) {
     setToasts(prev => [...prev, { id, message, type }])
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
-    }, 4000)
+    }, 4500)
   }
 
   const removeToast = (id) => {
     setToasts(prev => prev.filter(t => t.id !== id))
   }
 
+  const addUploadedDocument = (doc) => {
+    setUploadedDocuments(prev => {
+      const updated = [doc, ...prev]
+      try {
+        localStorage.setItem('vistaar_session_docs', JSON.stringify(updated))
+      } catch {
+        // ignore
+      }
+      return updated
+    })
+  }
+
+  const checkStatus = useCallback(async () => {
+    const res = await checkBackendHealth()
+    setBackendOnline(res.online)
+    return res.online
+  }, [])
+
+  useEffect(() => {
+    checkStatus()
+    const interval = setInterval(checkStatus, 15000)
+    return () => clearInterval(interval)
+  }, [checkStatus])
+
   return (
     <AppContext.Provider value={{
       sidebarOpen, toggleSidebar, closeSidebar,
       toasts, addToast, removeToast,
       uploadModal, setUploadModal,
+      uploadedDocuments, addUploadedDocument,
+      backendOnline, checkBackendStatus: checkStatus,
     }}>
       {children}
     </AppContext.Provider>
