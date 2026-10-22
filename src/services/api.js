@@ -196,6 +196,50 @@ export const chatService = {
     }
   },
 
+  /**
+   * Search the live web and synthesize an external answer.
+   * Endpoint: POST /search/web
+   * Rate limit: 10/minute
+   */
+  async searchWeb(query) {
+    const trimmed = query?.trim()
+    if (!trimmed) {
+      throw new Error('Please enter a search query.')
+    }
+
+    let res
+    try {
+      res = await fetch(`${API_BASE_URL}/search/web`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: trimmed }),
+      })
+    } catch (networkErr) {
+      throw new Error(
+        `Failed to reach web search endpoint at "${API_BASE_URL}/search/web". Ensure the backend is running.`
+      )
+    }
+
+    if (res.status === 429) {
+      throw new Error('Web search rate limit exceeded (10 queries per minute). Please wait a moment.')
+    }
+
+    if (!res.ok) {
+      let errDetail = `Server error HTTP ${res.status}`
+      try {
+        const errorJson = await res.json()
+        if (errorJson.detail) errDetail = errorJson.detail
+      } catch {
+        // ignore
+      }
+      throw new Error(errDetail)
+    }
+
+    return await res.json()
+  },
+
   async getConversations() {
     return mockConversations
   },
@@ -216,8 +260,6 @@ export const chatService = {
 
 // ============================================
 // Knowledge Graph Service
-// Note: Backend does not currently provide graph extraction endpoint;
-// this module provides client-side exploration visualization.
 // ============================================
 export const knowledgeGraphService = {
   async getGraph() {
@@ -240,10 +282,55 @@ export const insightsService = {
 }
 
 // ============================================
-// Image Intelligence Service
-// Note: Backend currently focuses on PDF/text RAG.
+// Image Intelligence Service (Gemini Vision)
 // ============================================
 export const imageService = {
+  /**
+   * Query an actual image using multimodal Gemini vision.
+   * Endpoint: POST /ask-image
+   * Rate limit: 10/minute
+   */
+  async askImage(file, question) {
+    if (!file) {
+      throw new Error('Please select an image to analyze.')
+    }
+
+    const formData = new FormData()
+    formData.append('file', file)
+    if (question && question.trim()) {
+      formData.append('question', question.trim())
+    }
+
+    let res
+    try {
+      res = await fetch(`${API_BASE_URL}/ask-image`, {
+        method: 'POST',
+        body: formData,
+      })
+    } catch (networkErr) {
+      throw new Error(
+        `Failed to reach image analysis endpoint at "${API_BASE_URL}/ask-image". Ensure the backend is running.`
+      )
+    }
+
+    if (res.status === 429) {
+      throw new Error('Image analysis rate limit exceeded. Please wait a moment before trying again.')
+    }
+
+    if (!res.ok) {
+      let errDetail = `Server error HTTP ${res.status}`
+      try {
+        const errorJson = await res.json()
+        if (errorJson.detail) errDetail = errorJson.detail
+      } catch {
+        // ignore
+      }
+      throw new Error(errDetail)
+    }
+
+    return await res.json()
+  },
+
   async analyzeImage(imageId) {
     const img = mockImages.find(i => i.id === imageId)
     return img ? {

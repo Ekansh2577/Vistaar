@@ -15,6 +15,15 @@ export function AppProvider({ children }) {
       return []
     }
   })
+  const [uploadedImages, setUploadedImages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vistaar_session_images')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  })
+  const [activeImage, setActiveImage] = useState(null)
   const [backendOnline, setBackendOnline] = useState(null) // null = checking, true = online, false = offline
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev)
@@ -44,6 +53,19 @@ export function AppProvider({ children }) {
     })
   }
 
+  const addUploadedImage = (img) => {
+    setUploadedImages(prev => {
+      const updated = [img, ...prev]
+      try {
+        localStorage.setItem('vistaar_session_images', JSON.stringify(updated))
+      } catch {
+        // ignore
+      }
+      return updated
+    })
+    setActiveImage(img)
+  }
+
   const checkStatus = useCallback(async () => {
     const res = await checkBackendHealth()
     setBackendOnline(res.online)
@@ -62,6 +84,8 @@ export function AppProvider({ children }) {
       toasts, addToast, removeToast,
       uploadModal, setUploadModal,
       uploadedDocuments, addUploadedDocument,
+      uploadedImages, addUploadedImage,
+      activeImage, setActiveImage,
       backendOnline, checkBackendStatus: checkStatus,
     }}>
       {children}

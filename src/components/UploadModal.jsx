@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext'
 import { documentService } from '../services/api'
 
 export default function UploadModal() {
-  const { uploadModal, setUploadModal, addToast, addUploadedDocument, backendOnline } = useApp()
+  const { uploadModal, setUploadModal, addToast, addUploadedDocument, addUploadedImage, backendOnline } = useApp()
   const [activeTab, setActiveTab] = useState('all') // 'all', 'document', 'image'
   const [selectedFile, setSelectedFile] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -48,6 +48,39 @@ export default function UploadModal() {
     setIsUploading(true)
     setErrorMessage('')
     setUploadProgress(25)
+
+    const isImage = selectedFile.type.startsWith('image/') || 
+      selectedFile.name.match(/\.(png|jpe?g|webp|gif)$/i)
+
+    if (isImage) {
+      setUploadStageText('Preparing visual asset for Gemini vision analysis...')
+      try {
+        const previewUrl = URL.createObjectURL(selectedFile)
+        const imgAsset = {
+          id: `img-${Date.now()}`,
+          name: selectedFile.name,
+          type: 'image',
+          size: `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`,
+          rawFile: selectedFile,
+          previewUrl: previewUrl,
+          uploadedAt: 'Just now',
+          status: 'Ready for Vision Analysis',
+          summary: 'Uploaded image ready for visual question answering, OCR reading, and diagram analysis.'
+        }
+        setUploadProgress(100)
+        addUploadedImage(imgAsset)
+        addToast(`Image "${selectedFile.name}" added to VISTAAR! Ask questions about it in Chat.`, 'success')
+        setTimeout(() => {
+          setIsUploading(false)
+          handleClose()
+        }, 500)
+      } catch (err) {
+        setIsUploading(false)
+        setErrorMessage('Failed to load image.')
+      }
+      return
+    }
+
     setUploadStageText('Transmitting file to backend ingestion endpoint...')
 
     try {
