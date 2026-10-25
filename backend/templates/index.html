@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RAG Document Question Answering</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f6f8; color: #333; }
+        h1 { color: #1e293b; margin-bottom: 25px; }
+        .box { background: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+        .box h3 { margin-top: 0; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        button { padding: 9px 18px; border: none; border-radius: 6px; background: #16a34a; color: white; cursor: pointer; font-weight: 500; font-size: 14px; transition: background 0.2s; }
+        button:hover { background: #15803d; }
+        button.secondary { background: #2563eb; }
+        button.secondary:hover { background: #1d4ed8; }
+        button.outline { background: white; color: #2563eb; border: 1px solid #2563eb; }
+        button.outline:hover { background: #eff6ff; }
+        input, textarea { width: 100%; box-sizing: border-box; padding: 10px; margin-top: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 14px; }
+        input:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-web { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-doc { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .sources-list { margin-top: 15px; display: grid; gap: 10px; }
+        .source-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 13px; }
+        .source-card a { color: #2563eb; font-weight: 600; text-decoration: none; }
+        .source-card a:hover { text-decoration: underline; }
+        .source-card .snippet { color: #475569; margin-top: 5px; font-size: 12px; line-height: 1.4; }
+        .answer-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-top: 10px; line-height: 1.6; white-space: pre-wrap; }
+        .notice-banner { padding: 12px 16px; border-radius: 8px; margin-top: 12px; font-size: 14px; }
+        .notice-warning { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; }
+        .notice-info { background: #eff6ff; border: 1px solid #dbeafe; color: #1e40af; }
+        .img-preview { max-width: 320px; max-height: 220px; border-radius: 8px; margin-top: 10px; border: 1px solid #e2e8f0; object-fit: contain; display: none; }
+    </style>
+</head>
+<body>
+
+<h1>VISTAAR — RAG Document Question Answering</h1>
+
+<!-- Box 1: Document Upload -->
+<div class="box">
+    <h3>📄 Upload Document</h3>
+    <p style="font-size:13px; color:#64748b; margin-top:0;">Select a PDF or text document and click <strong>Upload</strong> to index it into the FAISS vector database.</p>
+    <input type="file" id="fileInput" onchange="showFileName()">
+    <p id="fileName" style="font-size:14px;color:#475569; margin: 8px 0;"></p>
+    <button id="uploadBtn" onclick="uploadFile()">Upload Document</button>
+    <p id="uploadStatus" style="font-weight:bold; margin-top: 10px;"></p>
+</div>
+
+<!-- Box 2: Document Q&A + Web Fallback -->
+<div class="box">
+    <h3>💬 Ask Question</h3>
+    <textarea id="question" rows="3" placeholder="Type your question here (e.g. 'What is ARIMA?' or 'What are the drone return policies?')"></textarea>
+    <div style="margin-top: 10px;">
+        <button onclick="askQuestion()">Ask Document</button>
+    </div>
+
+    <div id="missingNotice" class="notice-banner notice-warning" style="display: none; margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <span>⚠️ <strong>Document evidence is insufficient or document is not uploaded yet.</strong> Would you like to search the live web instead?</span>
+            <button class="secondary" onclick="searchWebFallback()" id="webSearchBtn">🌐 Search the Web</button>
+        </div>
+    </div>
+
+    <div id="answerContainer" style="display: none; margin-top: 16px;">
+        <p style="margin-bottom: 6px;">
+            <strong>Answer:</strong>
+            <span id="answerBadge" class="badge badge-doc">Document Context</span>
+        </p>
+        <div id="answer" class="answer-box"></div>
+    </div>
+
+    <div id="webResultsContainer" style="display: none; margin-top: 18px;">
+        <p style="margin-bottom: 6px;">
+            <strong>External Web Citations:</strong>
+            <span class="badge badge-web">Live Web Sources</span>
+        </p>
+        <div id="sourcesList" class="sources-list"></div>
+    </div>
+</div>
+
+<!-- Box 3: Multimodal Image Analysis -->
+<div class="box">
+    <h3>🖼️ Multimodal Image Analysis</h3>
+    <p style="font-size:13px; color:#64748b; margin-top:0;">Upload an image (PNG, JPG, WEBP) to analyze visual elements, diagrams, or charts directly with Gemini Vision.</p>
+    <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
+    <img id="imagePreview" class="img-preview" alt="Preview">
+    <textarea id="imagePrompt" rows="2" style="margin-top: 10px;" placeholder="What is this image about? Describe key components and text.">What is this image about? Describe the key components and any visible text.</textarea>
+    <div style="margin-top: 10px;">
+        <button class="secondary" onclick="analyzeImage()">🔍 Analyze Image</button>
+    </div>
+    <div id="imageResultContainer" style="display: none; margin-top: 16px;">
+        <p style="margin-bottom: 6px;"><strong>Image Analysis:</strong></p>
+        <div id="imageAnswer" class="answer-box"></div>
+    </div>
+</div>
+
+<script>
+let isDocumentUploaded = false;
+
+function showFileName() {
+    let file = document.getElementById("fileInput").files[0];
+    if (file) {
+        document.getElementById("fileName").innerText = "Selected file: " + file.name + " (" + Math.round(file.size / 1024) + " KB) — Ready to upload!";
+        let status = document.getElementById("uploadStatus");
+        status.style.color = "#d97706";
+        status.innerText = "👉 Click the green 'Upload Document' button below to index this file.";
+    }
+}
+
+async function uploadFile() {
+    let file = document.getElementById("fileInput").files[0];
+    if (!file) {
+        alert("Please select a file first.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    let status = document.getElementById("uploadStatus");
+    let uploadBtn = document.getElementById("uploadBtn");
+    status.style.color = "#2563eb";
+    status.innerText = "⏳ Uploading and processing document into FAISS vector database...";
+    uploadBtn.disabled = true;
+
+    try {
+        let res = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        let data = await res.json();
+
+        if (data.message && data.message.toLowerCase().includes("not readable")) {
+            status.style.color = "#dc2626";
+            status.innerText = "❌ " + data.message;
+            isDocumentUploaded = false;
+        } else {
+            status.style.color = "#16a34a";
+            status.innerText = "✅ " + data.message;
+            isDocumentUploaded = true;
+        }
+    } catch (error) {
+        status.style.color = "#dc2626";
+        status.innerText = "❌ Upload failed: " + error.message;
+    } finally {
+        uploadBtn.disabled = false;
+    }
+}
+
+async function askQuestion() {
+    let question = document.getElementById("question").value.trim();
+    if (!question) {
+        alert("Enter a question first.");
+        return;
+    }
+
+    let fileSelected = document.getElementById("fileInput").files.length > 0;
+    if (fileSelected && !isDocumentUploaded) {
+        let confirmProceed = confirm("You have selected a file above, but haven't clicked 'Upload Document' yet.\n\nClick Cancel to go click 'Upload Document' first, or OK to ask anyway.");
+        if (!confirmProceed) return;
+    }
+
+    document.getElementById("missingNotice").style.display = "none";
+    document.getElementById("webResultsContainer").style.display = "none";
+    document.getElementById("answerContainer").style.display = "block";
+    document.getElementById("answerBadge").className = "badge badge-doc";
+    document.getElementById("answerBadge").innerText = "Document Context";
+    document.getElementById("answer").innerText = "Generating answer from document context...";
+
+    try {
+        let res = await fetch("/ask", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({question})
+        });
+
+        let data = await res.json();
+        let ans = data.answer || "";
+        document.getElementById("answer").innerText = ans;
+
+        let isMissing = ans.includes("could not find this in the document") ||
+                        ans.includes("No relevant information found") ||
+                        ans.includes("Please upload a document first");
+
+        if (isMissing) {
+            document.getElementById("missingNotice").style.display = "block";
+        }
+    } catch (error) {
+        document.getElementById("answer").innerText = "Error: " + error.message;
+    }
+}
+
+async function searchWebFallback() {
+    let question = document.getElementById("question").value.trim();
+    if (!question) {
+        alert("Enter a question first.");
+        return;
+    }
+
+    let webBtn = document.getElementById("webSearchBtn");
+    webBtn.disabled = true;
+    webBtn.innerText = "Searching Web...";
+
+    document.getElementById("answerContainer").style.display = "block";
+    document.getElementById("answerBadge").className = "badge badge-web";
+    document.getElementById("answerBadge").innerText = "Live Web Synthesis";
+    document.getElementById("answer").innerText = "Searching live web and synthesizing answer...";
+
+    try {
+        let res = await fetch("/search/web", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({query: question})
+        });
+
+        let data = await res.json();
+        document.getElementById("answer").innerText = data.synthesized_answer || "No response received.";
+
+        let sourcesList = document.getElementById("sourcesList");
+        sourcesList.innerHTML = "";
+        let sources = data.sources || [];
+
+        if (sources.length > 0) {
+            document.getElementById("webResultsContainer").style.display = "block";
+            sources.forEach((s, idx) => {
+                let card = document.createElement("div");
+                card.className = "source-card";
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <a href="${s.url}" target="_blank" rel="noopener noreferrer">[${idx + 1}] ${escapeHtml(s.title || "External Source")}</a>
+                        <span style="color:#64748b; font-size:11px;">${escapeHtml(s.domain || "")}</span>
+                    </div>
+                    <div class="snippet">${escapeHtml(s.snippet || "")}</div>
+                `;
+                sourcesList.appendChild(card);
+            });
+        }
+    } catch (error) {
+        document.getElementById("answer").innerText = "Web search error: " + error.message;
+    } finally {
+        webBtn.disabled = false;
+        webBtn.innerText = "🌐 Search the Web";
+    }
+}
+
+function previewImage() {
+    let file = document.getElementById("imageInput").files[0];
+    let preview = document.getElementById("imagePreview");
+    if (file) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = "none";
+    }
+}
+
+async function analyzeImage() {
+    let file = document.getElementById("imageInput").files[0];
+    let question = document.getElementById("imagePrompt").value.trim();
+
+    if (!file) {
+        alert("Please select an image first.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", file);
+    formData.append("question", question || "What is this image about?");
+
+    let container = document.getElementById("imageResultContainer");
+    let answerEl = document.getElementById("imageAnswer");
+    container.style.display = "block";
+    answerEl.innerText = "Analyzing image with Gemini Vision...";
+
+    try {
+        let res = await fetch("/ask-image", {
+            method: "POST",
+            body: formData
+        });
+        let data = await res.json();
+        answerEl.innerText = data.answer || "No analysis returned.";
+    } catch (error) {
+        answerEl.innerText = "Error analyzing image: " + error.message;
+    }
+}
+
+function escapeHtml(text) {
+    let map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+    return (text || "").replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+</script>
+
+</body>
+</html>

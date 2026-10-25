@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+faiss-cpu
+sentence-transformers
+PyPDF2
+slowapi
+google-genai
+python-dotenv
+ddgs
