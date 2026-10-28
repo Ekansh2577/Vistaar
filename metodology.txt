@@ -1,0 +1,386 @@
+================================================================================
+                       RESEARCH PAPER METHODOLOGY SPECIFICATION
+================================================================================
+TITLE: VISTAAR: A Grounded Retrieval-Augmented Generation Architecture with
+       Resilient Multi-Tier External Web Synthesis and Decoupled Multimodal
+       Vision Intelligence
+================================================================================
+
+SECTION 3: METHODOLOGY
+
+3.1 SYSTEM ARCHITECTURE OVERVIEW
+
+The VISTAAR architecture addresses two ubiquitous pathologies in modern dense
+retrieval and large language model (LLM) workflows: (1) parametric hallucination
+when localized corpus evidence is absent or insufficient, and (2) index poisoning
+caused by co-mingling heterogeneous multimodal image representations into dense
+lexical vector databases.
+
+VISTAAR establishes a decoupled, three-tier enterprise intelligence framework:
+1. An In-Corpus Grounded Retrieval-Augmented Generation (RAG) Subsystem,
+   leveraging sliding-window document chunking, dense semantic vector encoding,
+   and exact nearest-neighbor search within an in-memory Facebook AI Similarity
+   Search (FAISS) vector space.
+2. A Dynamic Multi-Tier External Web Fallback Subsystem, configured to detect
+   boundary conditions where document evidence is non-existent or insufficient,
+   seamlessly dispatching multi-strategy search queries and synthesizing external
+   intelligence with strict provenance citations.
+3. A Decoupled Multimodal Vision Subsystem, streaming raw binary image buffers
+   directly to vision-language models (Gemini Vision) with zero impact on the
+   textual vector store.
+
+The backend is built upon an asynchronous FastAPI microservice framework with
+token-bucket rate limiting (SlowAPI), exposed to a dual-interface presentation
+layer comprising an interactive React 19 single-page application (SPA) and a
+lightweight Jinja2-templated operational dashboard.
+
+diagram _ 1 (High-Level System Architecture of VISTAAR illustrating Dual Frontends [React 19 SPA and Jinja2 Web UI], FastAPI Gateway with SlowAPI Rate Limiting, Ingestion Pipeline with Format Parsers, In-Memory FAISS Vector Database, Grounded Gemini Generation Engine, External Multi-Tier Web Search Fallback, and Decoupled Multimodal Vision Engine)
+
+
+3.2 DOCUMENT INGESTION AND PREPROCESSING PIPELINE
+
+The ingestion pipeline accepts heterogeneous unstructured inputs, specifically
+Portable Document Format (.pdf) files and raw plain-text assets (.txt, .md,
+.json, .csv). The ingestion protocol executes the following formal sequence:
+
+1. Binary Ingestion & Validation: Raw byte sequences B are streamed via an HTTP
+   POST multipart/form-data transaction. An upload rate limiter enforces a strict
+   quota of 5 requests per minute per originating IP address:
+   
+       R_upload = 5 req/min, Burst = 1
+       
+2. Format-Aware Text Extraction:
+   - For PDF documents (filename ending in .pdf), the byte stream is wrapped into
+     an in-memory binary stream io.BytesIO(B) and parsed sequentially via
+     PyPDF2.PdfReader. Page-level textual elements are concatenated:
+     
+         T = \bigoplus_{p=1}^{P} \text{ExtractText}(page_p)
+         
+   - For unstructured text assets, bytes are decoded under the UTF-8 schema with
+     strict lossy-character suppression (errors='ignore').
+     
+3. Extraction Integrity Barrier:
+   Extracted text string T is evaluated against a minimum character threshold
+   \theta_{min} = 50:
+   
+       \text{Status}(T) = \begin{cases} 
+       \text{Accept and Enqueue}, & \text{if } |T| \ge 50 \\
+       \text{Reject with 422 HTTP Payload}, & \text{if } |T| < 50 
+       \end{cases}
+       
+   This prevents scanned-image PDFs devoid of OCR layers from polluting downstream
+   embedding representations.
+
+4. Non-Blocking Background Dispatch:
+   Validated document strings are dispatched asynchronously using FastAPI
+   BackgroundTasks, returning immediate HTTP 200 acknowledgment to the client
+   while worker threads execute CPU-bound chunking and embedding operations.
+
+
+3.3 SEMANTIC PARTITIONING AND SLIDING-WINDOW CHUNKING STRATEGY
+
+Unstructured textual corpora exhibit non-uniform semantic density. To balance
+context retention against maximum sequence length constraints, VISTAAR implements
+a deterministic sliding-window character partitioning model.
+
+Given a document text string T of length N = |T|:
+- Chunk size: L = 1000 characters
+- Overlap size: O = 200 characters
+- Stride parameter: S = L - O = 800 characters
+
+The set of generated text chunks \mathcal{C} = \{C_0, C_1, \dots, C_{M-1}\} is
+formally defined by:
+
+    C_i = T[i \cdot S : \min(i \cdot S + L, N)], \quad \forall i \in \left\{0, 1, \dots, \left\lfloor \frac{N - O - 1}{S} \right\rfloor \right\}
+
+The overlap ratio \gamma = \frac{O}{L} = 0.20 ensures that semantic entities,
+cross-sentence dependencies, and technical definitions straddling chunk boundaries
+are preserved in both adjacent vectors, preventing boundary truncation errors
+during similarity search.
+
+diagram _ 2 (Document Ingestion and Semantic Sliding-Window Chunking Pipeline showing Text Extraction from PDF/TXT, 1000-character Chunk Generation with 200-character Stride Overlap, 384-dimensional Sentence-Transformer Embedding Encoding, and FAISS FlatL2 Indexing)
+
+
+3.4 DENSE VECTOR EMBEDDING REPRESENTATION
+
+Each chunk C_i \in \mathcal{C} is projected into a continuous, dense vector
+space \mathbb{R}^d using the sentence-transformers model 'all-MiniLM-L6-v2', a
+distilled 6-layer MiniLM architecture pre-trained on over 1 billion sentence pairs
+and fine-tuned for contrastive semantic similarity.
+
+The embedding mapping function f_\theta: \mathcal{T} \rightarrow \mathbb{R}^{384}
+maps arbitrary-length textual sequences into a normalized 384-dimensional vector:
+
+    \mathbf{e}_i = f_\theta(C_i), \quad \mathbf{e}_i \in \mathbb{R}^{384}, \quad \|\mathbf{e}_i\|_2 = 1
+
+Key properties of the embedding space:
+- Latent semantic clustering: Paraphrased statements and domain synonyms map to
+  proximal spatial neighborhoods.
+- Computational efficiency: The compact 384-dimensional vector allows low-latency
+  matrix operations on CPU hardware without necessitating GPU tensor acceleration.
+- Batch vectorization: Chunks are encoded collectively to exploit vectorized
+  PyTorch SIMD instructions.
+
+
+3.5 VECTOR INDEXING AND SIMILARITY RETRIEVAL (FAISS)
+
+Dense chunk embeddings are indexed into an in-memory vector store governed by
+Facebook AI Similarity Search (FAISS).
+
+1. Index Topology:
+   VISTAAR utilizes the faiss.IndexFlatL2 topology with dimensionality d = 384.
+   Unlike approximate nearest neighbor (ANN) structures that utilize inverted file
+   lists (IVF) or Hierarchical Navigable Small World (HNSW) graphs, IndexFlatL2
+   implements an exact, non-lossy brute-force search over the vector manifold.
+   This guarantees 100% recall accuracy (\text{Recall}@k = 1.0) across indexed
+   chunks.
+
+2. Distance Metric:
+   Given a user query string q, the query embedding \mathbf{q} \in \mathbb{R}^{384}
+   is computed using identical model weights:
+   
+       \mathbf{q} = f_\theta(q)
+
+   The similarity distance between query vector \mathbf{q} and indexed chunk vector
+   \mathbf{e}_i is computed using the Euclidean (L2) distance:
+   
+       \mathcal{D}_{L2}(\mathbf{q}, \mathbf{e}_i) = \|\mathbf{q} - \mathbf{e}_i\|_2 = \sqrt{\sum_{j=1}^{384} (q_j - e_{i,j})^2}
+
+3. k-Nearest Neighbor Retrieval:
+   The search operator retrieves the top-k nearest document chunks:
+   
+       \mathcal{R}_k(q) = \arg\min_{\mathcal{S} \subset \mathcal{C}, |\mathcal{S}|=k} \sum_{C_i \in \mathcal{S}} \mathcal{D}_{L2}(\mathbf{q}, \mathbf{e}_i)
+
+   VISTAAR empirically configures k = 8 chunks. This provides a balance between
+   sufficient semantic recall (\approx 8000 characters \approx 2000 tokens of context)
+   and distractor chunk suppression, maintaining prompt context window hygiene.
+
+4. Empty Index Barrier:
+   If the total indexed vectors n_{total} = 0, the retrieval module short-circuits
+   immediately, returning an explicit system notification:
+   "No relevant information found. Please upload a document first."
+
+
+3.6 STRICT GROUNDED GENERATION AND HALLUCINATION SUPPRESSION
+
+Retrieved context chunks \mathcal{R}_k(q) are synthesized into an answer using
+Gemini (Google DeepMind's Gemini 3 Flash / 3.5 Flash series) under strict prompt
+engineering boundaries.
+
+1. Prompt Synthesis:
+   Retrieved chunks are concatenated using unique boundary delimiters:
+   
+       \mathcal{K} = \bigoplus_{i=1}^{k} \left( C_{(i)} \parallel \text{"\n\n---\n\n"} \right)
+       
+   The assembled prompt presented to the generative model is structured as:
+   
+       \mathcal{P}_{grounded} = \text{"Context:\n"} \parallel \mathcal{K} \parallel \text{"\n\nQuestion: "} \parallel q
+
+2. Deterministic Temperature Calibration:
+   The inference temperature is pinned strictly to T = 0.0:
+   
+       \mathcal{G}(q, \mathcal{K}) = \text{LLM}(\mathcal{P}_{grounded}; T = 0.0)
+       
+   Setting T = 0.0 eliminates stochastic decoding sampling, forcing greedy argmax
+   token selection for maximal factual determinism.
+
+3. System Instruction & Boundary Rejection:
+   The system instruction mandates absolute grounding:
+   
+       \text{"You answer questions using ONLY the context provided. "} \parallel
+       \text{"If the answer is not in the context, reply exactly: "} \parallel
+       \text{"'I could not find this in the document.' "} \parallel
+       \text{"Do not use outside knowledge and do not guess."}
+
+   If the contextual premise does not contain sufficient semantic entailment to
+   resolve q, the model outputs the canonical boundary string:
+   
+       A_{doc} = \text{"I could not find this in the document."}
+
+diagram _ 3 (Grounded Retrieval-Augmented Generation [RAG] Decision Flowchart showing User Query Vectorization, FAISS k-NN Top-8 Chunk Retrieval, Strict Zero-Temperature Prompt Synthesis, Canonical Boundary Rejection Check, and Automatic Fallback Routing)
+
+
+3.7 DYNAMIC MULTI-TIER EXTERNAL WEB SYNTHESIS FALLBACK
+
+When document grounding fails or the user queries concepts outside private
+assets, VISTAAR transitions to an isolated external web search and synthesis
+pipeline exposed via POST /search/web.
+
+1. Detection of Evidence Insufficiency:
+   The system evaluates response A:
+   
+       \delta(A) = \begin{cases}
+       1, & \text{if } A \in \{\text{"I could not find this in the document."}, \text{"No relevant information found..."}\} \\
+       0, & \text{otherwise}
+       \end{cases}
+       
+   When \delta(A) = 1, the client interface renders an intuitive visual alert
+   coupled with an automated action: [Search the Web].
+
+2. Multi-Tier Resilient Web Scraping Engine:
+   To ensure resilience against rate limits, IP blocks, or upstream network
+   fluctuations, the retrieval engine implements a three-tier cascade:
+   
+   - Tier 1: DuckDuckGo HTML Search (`DDGS(timeout=8)`).
+     Queries live search results directly via HTML endpoints, extracting titles,
+     target URLs, and snippet bodies.
+     
+   - Tier 2: DuckDuckGo Instant Answer JSON API.
+     If Tier 1 fails or returns zero results, queries the structured Instant
+     Answer endpoint (`https://api.duckduckgo.com/`), parsing `AbstractText`,
+     `AbstractURL`, and `RelatedTopics`.
+     
+   - Tier 3: Wikipedia OpenSearch API.
+     If fewer than 2 results are acquired, queries the Wikipedia OpenSearch API
+     (`en.wikipedia.org/w/api.php?action=opensearch`) to obtain authoritative
+     encyclopedic summaries and verified URLs.
+
+3. Citation Extraction & Provenance Normalization:
+   Each acquired web candidate is mapped to a standardized provenance tuple:
+   
+       \mathbf{w}_j = \langle \text{Title}_j, \text{URL}_j, \text{Snippet}_j, \text{Domain}_j \rangle
+       
+   where \text{Domain}_j = \text{urlparse}(\text{URL}_j).\text{netloc}. A maximum of 4
+   distinct, deduplicated sources are retained: \mathcal{W} = \{\mathbf{w}_1, \dots, \mathbf{w}_4\}.
+
+4. External Knowledge Synthesis:
+   Web search context is aggregated into an external prompt:
+   
+       \mathcal{K}_{web} = \bigoplus_{j=1}^{|\mathcal{W}|} \left( \text{"[j] "} \parallel \text{Title}_j \parallel \text{" ("} \parallel \text{Domain}_j \parallel \text{"):\n"} \parallel \text{Snippet}_j \parallel \text{"\nURL: "} \parallel \text{URL}_j \right)
+       
+   The LLM synthesizes an objective, coherent answer with temperature T = 0.2,
+   formally labeled as external information. The UI presents the synthesized
+   answer alongside clickable citation cards with domains and direct hyperlinks.
+
+diagram _ 4 (Multi-Tier Resilient Web Search and Synthesis Pipeline detailing Primary DuckDuckGo Scraper, Secondary DuckDuckGo Instant Answer API, Tertiary Wikipedia OpenSearch API, URL/Domain Extraction, Context Formatting, and Parametric Gemini Synthesis with Citation Linking)
+
+
+3.8 DECOUPLED MULTIMODAL VISION PROCESSING ARCHITECTURE
+
+In contrast to conventional systems that attempt to parse images via lossy Optical
+Character Recognition (OCR) and force the resultant text into the document FAISS
+vector index, VISTAAR decouples visual intelligence entirely from document RAG.
+
+1. Dedicated Vision Endpoint:
+   Exposed via `POST /ask-image`, accepting a multipart payload comprising:
+   - file: Raw binary image buffer
+   - question: Form-encoded query string (defaulting to comprehensive visual inspection)
+
+2. Pre-Inference Validation & MIME Sanitization:
+   The service inspects the binary signature and headers, enforcing:
+   - MIME Type Whitelist: `image/png`, `image/jpeg`, `image/webp`, `image/gif`
+   - File Size Guardrail: Size \le 20\text{ MB}
+
+3. Direct Tensor/Byte Streaming:
+   Image bytes are packaged into a native multimodal payload using the Google
+   GenAI SDK (`types.Part.from_bytes(data=image_bytes, mime_type=mime_type)`).
+   No intermediate files are persisted to disk, eliminating file I/O latency and
+   ephemeral storage leakage.
+
+4. Dual Visual Task Execution:
+   The visual model executes concurrent cognitive tasks governed by a specialized
+   system prompt:
+   - Visual Structural Comprehension: Explaining architectural diagrams, isometric
+     renderings, flowcharts, interface layouts, and graphical plots.
+   - Dense Text & Mathematical Transcription: Reading printed text, handwritten
+     annotations, mathematical equations, and source code snippets directly from
+     the pixel matrix.
+   - Targeted Grounded Answering: Answering the user's explicit question q_{img}
+     solely based on visually depicted evidence.
+
+5. Zero Cross-Talk Guarantee:
+   The visual stream operates completely out-of-band from `vector_store.py`.
+   Document vectors are neither modified nor contaminated, maintaining vector
+   store determinism and fast sub-millisecond retrieval.
+
+diagram _ 5 (Decoupled Multimodal Image Analysis Architecture showing Multipart Form-Data Ingestion, MIME Validation, Direct Base64/Byte Streaming to Gemini Vision, Zero-Temperature Visual Context Extraction, and OCR Transcription)
+
+
+3.9 ASYNCHRONOUS CONCURRENCY AND RATE LIMITING SPECIFICATION
+
+To guarantee operational stability under enterprise workloads and prevent upstream
+API quota exhaustion, VISTAAR incorporates rate-limiting policies managed via SlowAPI
+and Starlette middleware.
+
+TABLE 3.1: ENDPOINT RATE LIMITING AND RESOURCE CONSTRAINTS
+--------------------------------------------------------------------------------------
+Endpoint        Method    Rate Limit     Processing Mode        Upstream Dependency
+--------------------------------------------------------------------------------------
+/upload         POST      5 req / min    Async BackgroundTask   SentenceTransformers/FAISS
+/ask            POST      10 req / min   Synchronous Block      FAISS + Gemini Client
+/search/web     POST      10 req / min   Synchronous Cascade    DDG / OpenSearch + Gemini
+/ask-image      POST      10 req / min   Synchronous Stream     Gemini Vision Multimodal
+--------------------------------------------------------------------------------------
+
+When a client breaches these thresholds, the gateway responds with HTTP 429
+(Too Many Requests), accompanied by standard RFC 6585 `Retry-After` headers, which
+the frontend service layer intercepts and surfaces as user-friendly toast alerts.
+
+
+3.10 END-TO-END ALGORITHMIC FORMULATION
+
+The unified operational logic across VISTAAR is formalized in Algorithm 1 and
+Algorithm 2.
+
+--------------------------------------------------------------------------------------
+ALGORITHM 1: Document Ingestion, Chunking, and FAISS Indexing
+--------------------------------------------------------------------------------------
+Input : Document byte stream B, Filename F
+Output: HTTP Status, Ingestion Message
+
+1: if RateLimiter.Exceeded(IP, "5/minute") then
+2:     return HTTP_429("Rate limit exceeded")
+3: end if
+4: T \leftarrow ExtractText(B, F)
+5: if Length(T) < 50 then
+6:     return HTTP_422("Text unreadable or below minimum length")
+7: end if
+8: DispatchBackgroundTask(ExecuteIngestion, T)
+9: return HTTP_200("Document uploaded. Processing started.")
+10:
+11: procedure ExecuteIngestion(T)
+12:    \mathcal{C} \leftarrow []
+13:    for i \leftarrow 0 to Length(T) step 800 do
+14:        C \leftarrow Substring(T, i, i + 1000)
+15:        \mathcal{C}.\text{append}(C)
+16:    end for
+17:    \mathbf{E} \leftarrow \text{SentenceTransformer}.\text{encode}(\mathcal{C})
+18:    FAISS_IndexFlatL2.\text{add}(\mathbf{E})
+19:    StoredChunks.\text{extend}(\mathcal{C})
+20: end procedure
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------
+ALGORITHM 2: Grounded Q&A with Resilient External Web Fallback
+--------------------------------------------------------------------------------------
+Input : User Question q, Vector Store \mathcal{V}, Mode \in \{\text{Auto}, \text{Doc}, \text{Web}\}
+Output: Response Payload \langle Answer, SourceType, Citations \rangle
+
+1: if Mode = \text{Doc} or Mode = \text{Auto} then
+2:     if \mathcal{V}.n_{total} = 0 then
+3:         Answer \leftarrow "No relevant information found. Please upload a document first."
+4:     else
+5:         \mathbf{q} \leftarrow \text{SentenceTransformer}.\text{encode}([q])[0]
+6:         \mathcal{R}_k \leftarrow \mathcal{V}.\text{search}(\mathbf{q}, k=8)
+7:         \mathcal{P} \leftarrow \text{AssemblePrompt}(\mathcal{R}_k, q)
+8:         Answer \leftarrow \text{LLM}(\mathcal{P}; T=0.0)
+9:     end if
+10:
+11:    if Answer \ne "I could not find this in the document." and Answer \ne "No relevant information..." then
+12:        return \langle Answer, \text{"document"}, \mathcal{R}_k \rangle
+13:    end if
+14: end if
+15:
+16: // Trigger Dynamic External Web Fallback
+17: \mathcal{W} \leftarrow \text{SearchDDG}(q, \text{max}=4)
+18: if \mathcal{W} = \emptyset then
+19:     \mathcal{W} \leftarrow \text{SearchInstantAPI}(q) \cup \text{SearchWikipedia}(q)
+20: end if
+21: \mathcal{P}_{web} \leftarrow \text{AssembleWebPrompt}(\mathcal{W}, q)
+22: SynthesizedAnswer \leftarrow \text{LLM}(\mathcal{P}_{web}; T=0.2)
+23: return \langle SynthesizedAnswer, \text{"web"}, \mathcal{W} \rangle
+--------------------------------------------------------------------------------------
+
+================================================================================
+                                END OF METHODOLOGY
+================================================================================

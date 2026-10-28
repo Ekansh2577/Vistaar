@@ -1,0 +1,59 @@
+[SYNTHETIC EVALUATION CORPUS - CONTROLLED BENCHMARK DATASET FOR VISTAAR RAG RESEARCH EVALUATION. NOT AN EMPIRICAL HARDWARE/SYSTEM SPECIFICATION.]
+
+# Comparative Retrieval Baselines and Algorithmic Frameworks
+
+## 1. Dense Passage Retrieval (DPR) Baseline
+Dense Passage Retrieval (DPR) represents a dual-encoder retrieval paradigm that replaces traditional lexical indexers with dense representations. In DPR, two independent BERT-base encoders are trained: a question encoder that maps questions to 768-dimensional vectors, and a passage encoder that maps document passages to the same 768-dimensional space.
+Similarity is computed using the dot product between the question vector and passage vectors:
+Score(q, p) = <E_Q(q), E_P(p)>
+DPR is trained using a contrastive loss function with in-batch negatives and mined hard negatives selected from top BM25 search results that do not contain the answer string. While DPR achieves superior recall on open-domain questions requiring semantic understanding, its dual 768-dimensional encoders require substantially greater GPU memory and computational overhead compared to VISTAAR's 384-dimensional all-MiniLM-L6-v2 architecture.
+Furthermore, DPR's performance can drop when evaluating domain-specific jargon that differs substantially from the Wikipedia corpora on which the dual encoders were originally pre-trained.
+
+## 2. BM25 Lexical Keyword Baseline
+BM25 (Best Matching 25) is an established probabilistic lexical ranking function based on term frequency and inverted index lookup. The BM25 score for a document D given a query Q containing terms q_i is defined as:
+BM25(D, Q) = sum_{i=1}^n IDF(q_i) * (f(q_i, D) * (k1 + 1)) / (f(q_i, D) + k1 * (1 - b + b * (|D| / avgdl)))
+In standard benchmarking configurations, the hyperparameters are fixed at k1 = 1.2 and b = 0.75.
+BM25 exhibits notable strengths in retrieving exact technical identifiers, part numbers, and rare domain terminology that dense embeddings frequently compress into general semantic regions. Conversely, BM25 fails completely when queries and documents use synonyms or paraphrased expressions with zero lexical overlap.
+The BM25 index is constructed using Lucene tokenization pipelines, applying lowercase normalization, standard English stopword removal, and the Porter stemming algorithm.
+
+## 3. Hybrid Sparse-Dense Fusion via Reciprocal Rank Fusion
+To combine the lexical precision of BM25 with the semantic generalization of dense embeddings, modern retrieval systems employ hybrid fusion. A widely adopted method is Reciprocal Rank Fusion (RRF), which combines ranked lists without requiring score calibration or normalization.
+The RRF score of a document d across a set of retrieval methods M is calculated as:
+RRF_Score(d) = sum_{m in M} 1 / (k_rrf + r_m(d))
+where r_m(d) is the rank of document d in ranking method m (with ranks starting at 1), and k_rrf is a smoothing constant typically set to 60.
+In empirical evaluations on heterogeneous corpora, hybrid RRF consistently outperforms standalone dense retrieval by 3.8% in Recall@10 while mitigating the failure modes of out-of-vocabulary queries.
+By operating strictly on integer ranks rather than raw similarity logits or probabilistic scores, RRF avoids the need for empirical weight tuning across disparate scoring distributions.
+
+## 4. GraphRAG Knowledge Graph Augmentation
+GraphRAG augments dense vector retrieval by constructing a structured knowledge graph from the document corpus. In the GraphRAG framework, an LLM parses text chunks to extract named entities (e.g., organizations, systems, protocols) and relationships (triples of subject-predicate-object).
+These entities and relations are indexed into a labeled property graph database such as Neo4j. GraphRAG then applies community detection algorithms, specifically the hierarchical Leiden algorithm, to cluster closely related entities into semantic communities.
+For each community, the system pre-generates hierarchical community summaries. During query processing, GraphRAG navigates both the vector embedding index and the graph hierarchy, enabling multi-hop reasoning across globally dispersed documents that cannot be retrieved through single-hop vector similarity alone.
+Graph construction requires substantial upfront LLM processing cost, making it significantly more compute-intensive during document ingestion than VISTAAR's flat sliding-window embedding pipeline.
+
+## 5. Self-RAG and Adaptive Retrieval Framework
+Self-RAG (Self-Reflective Retrieval-Augmented Generation) introduces an adaptive mechanism where an LLM dynamically controls its own retrieval process through special reflection tokens. Rather than retrieving a fixed number of passages unconditionally for every query, Self-RAG trains the generator to emit:
+- [Retrieve]: emitted when external knowledge is required to answer the query.
+- [IsRel]: evaluates whether the retrieved passage is relevant to the prompt.
+- [IsSup]: evaluates whether the generated output is fully supported by the retrieved context.
+- [IsUse]: assesses the overall utility and informativeness of the generated response.
+This self-reflective mechanism suppresses unnecessary retrieval operations for queries that can be answered from parametric memory, reducing API latency and eliminating noise from irrelevant retrieved chunks.
+During inference, a beam search algorithm balances generation probabilities against reflection token scores, pruning retrieval paths that yield ungrounded or redundant statements.
+
+## 6. Hypothetical Document Embeddings (HyDE) Baseline
+HyDE (Hypothetical Document Embeddings) transforms zero-shot retrieval by instructing an instruction-tuned LLM to generate a hypothetical answer passage for an incoming query before retrieval occurs. Even if the generated hypothetical document contains factual inaccuracies, its stylistic and topical vocabulary closely mirrors the target document corpus.
+The hypothetical document is then embedded using a dense encoder, and its embedding vector serves as the search query in the vector store.
+In comparative trials on technical documentation, HyDE demonstrates elevated recall for abstract conceptual queries but introduces an additional LLM generation round-trip latency penalty prior to vector retrieval.
+
+## 7. ColBERT Late-Interaction Multi-Vector Retrieval
+ColBERT (Contextualized Late Interaction over BERT) employs a multi-vector representation model that preserves token-level embeddings for both queries and documents. Rather than compressing an entire chunk into a single fixed-length vector, ColBERT computes token vectors and performs retrieval using the MaxSim operator:
+Score(Q, D) = sum_{q in Q} max_{d in D} (E(q) . E(d))
+ColBERT achieves retrieval quality approaching cross-encoders while retaining indexing throughput comparable to dual-encoders. However, storing hundreds of token vectors per document chunk increases index memory footprints by roughly an order of magnitude compared to VISTAAR's single 384-dimensional vector per chunk.
+
+## 8. Cross-Encoder Re-Ranking Pipeline with BGE-Reranker
+In two-stage retrieval architectures, a bi-encoder (such as all-MiniLM-L6-v2) retrieves an initial candidate pool of top-50 chunks, which are subsequently scored by a cross-encoder model like bge-reranker-large. The cross-encoder receives the query and chunk concatenated together, allowing full self-attention across all tokens. While cross-encoder re-ranking improves top-3 precision by resolving fine-grained semantic nuances that bi-encoders miss, it introduces significant computational latency, adding roughly 45 milliseconds of inference time per candidate batch on modern GPU hardware.
+
+## 9. Pseudo-Relevance Feedback and Query Expansion
+Pseudo-Relevance Feedback (PRF) assumes that the top-ranked passages returned by an initial retrieval pass are relevant to the user query. The algorithm extracts top informative terms from these initial passages using TF-IDF or RM3 term weighting and expands the original query vector before executing a final retrieval pass. In benchmark evaluations, PRF improves recall for verbose or exploratory queries but risks topic drift when the initial retrieval pass returns irrelevant false positives.
+
+## 10. Dense-Lexical Score Interpolation and Convex Combination Baselines
+As an alternative to rank-based Reciprocal Rank Fusion, convex combination baselines normalize min-max scaled dense inner product scores and BM25 scores into a unified composite score: Score_comb(d) = alpha * Score_dense(d) + (1 - alpha) * Score_BM25(d). Tuning the interpolation parameter alpha between 0.0 and 1.0 allows fine-grained balancing between keyword precision and semantic recall. Empirical results show that alpha = 0.65 yields the highest Mean Reciprocal Rank on technical documentation benchmarks.

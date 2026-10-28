@@ -1,0 +1,37 @@
+{
+  "pdfs": [
+    "css.pdf",
+    "Dsa.pdf",
+    "spring_boot_tutorial.pdf"
+  ],
+  "chunk_count": 675,
+  "question_count": 30,
+  "embedding_seconds": 16.924,
+  "k_summary": [
+    {
+      "k": 3,
+      "questions": 30,
+      "expected_source_hit_rate": 0.4666666666666667,
+      "any_anchor_hit_rate": 0.6333333333333333,
+      "all_anchor_chunk_hit_rate": 0.5333333333333333,
+      "interpretation": "Diagnostic string-anchor proxy; manually judge evidence before paper reporting."
+    },
+    {
+      "k": 5,
+      "questions": 30,
+      "expected_source_hit_rate": 0.4666666666666667,
+      "any_anchor_hit_rate": 0.8,
+      "all_anchor_chunk_hit_rate": 0.6,
+      "interpretation": "Diagnostic string-anchor proxy; manually judge evidence before paper reporting."
+    },
+    {
+      "k": 8,
+      "questions": 30,
+      "expected_source_hit_rate": 0.4666666666666667,
+      "any_anchor_hit_rate": 0.8,
+      "all_anchor_chunk_hit_rate": 0.6,
+      "interpretation": "Diagnostic string-anchor proxy; manually judge evidence before paper reporting."
+    }
+  ],
+  "warning": "This runner reports retrieval only. Anchor-string metrics are proxies and must not be described as human-verified precision/recall. Answer quality requires a separate Gemini run and manual adjudication."
+}

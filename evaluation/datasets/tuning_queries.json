@@ -1,0 +1,184 @@
+[
+  {
+    "question_id": "PH2-Q03",
+    "category": "sufficient_single",
+    "split": "dev",
+    "question": "Which FAISS index type is used in VISTAAR, and what distance metric does it compute?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c05"
+    ],
+    "ground_truth_global_indices": [
+      5
+    ],
+    "exact_evidence_spans": [
+      "The baseline implementation initializes an in-memory index using faiss.IndexFlatL2 with dimension 384. This index type executes an exact, brute-force Euclidean distance search across all stored vectors."
+    ],
+    "reference_answer": "VISTAAR uses the in-memory faiss.IndexFlatL2 index with dimension 384, which computes exact, brute-force Euclidean distance (L2 distance).",
+    "expected_behavior": "Direct factual extraction from DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q07",
+    "category": "sufficient_single",
+    "split": "dev",
+    "question": "What acoustic model architecture and training dataset volume are used in VISTAAR's speech transcription module?",
+    "target_documents": [
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c04",
+      "doc_02_multimodal_indic_c05"
+    ],
+    "ground_truth_global_indices": [
+      19,
+      20
+    ],
+    "exact_evidence_spans": [
+      "Audio transcription is performed using a Conformer-CTC acoustic architecture trained on 10,000 hours of multilingual Indian audio covering 12 regional languages."
+    ],
+    "reference_answer": "The speech transcription module uses a Conformer-CTC acoustic architecture trained on 10,000 hours of multilingual Indian audio covering 12 regional languages.",
+    "expected_behavior": "Direct factual extraction from DOC-02.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q14",
+    "category": "sufficient_multi",
+    "split": "dev",
+    "question": "How does VISTAAR's baseline FAISS index type compare to GraphRAG in terms of data structure and indexing approach?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt",
+      "doc_03_comparative_baselines.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c05",
+      "doc_03_comparative_baselines_c04"
+    ],
+    "ground_truth_global_indices": [
+      5,
+      31
+    ],
+    "exact_evidence_spans": [
+      "The baseline implementation initializes an in-memory index using faiss.IndexFlatL2 with dimension 384. This index type executes an exact, brute-force Euclidean distance search across all stored vectors.",
+      "GraphRAG augments dense vector retrieval by constructing a structured knowledge graph from the document corpus.",
+      "These entities and relations are indexed into a labeled property graph database such as Neo4j. GraphRAG then applies community detection algorithms, specifically the hierarchical Leiden algorithm, to cluster closely related entities into semantic communities."
+    ],
+    "reference_answer": "VISTAAR's baseline uses an in-memory faiss.IndexFlatL2 vector index performing brute-force Euclidean distance search across flat text chunk vectors, whereas GraphRAG extracts named entities and relations into a Neo4j labeled property graph and clusters them into semantic communities using the hierarchical Leiden algorithm.",
+    "expected_behavior": "Synthesize index architectures from DOC-01 and DOC-03.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q18",
+    "category": "sufficient_multi",
+    "split": "dev",
+    "question": "Compare BM25 hyperparameter settings with the RRF smoothing constant used in hybrid retrieval baselines.",
+    "target_documents": [
+      "doc_03_comparative_baselines.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_03_comparative_baselines_c01",
+      "doc_03_comparative_baselines_c02",
+      "doc_03_comparative_baselines_c03"
+    ],
+    "ground_truth_global_indices": [
+      28,
+      29,
+      30
+    ],
+    "exact_evidence_spans": [
+      "In standard benchmarking configurations, the hyperparameters are fixed at k1 = 1.2 and b = 0.75.",
+      "RRF_Score(d) = sum_{m in M} 1 / (k_rrf + r_m(d))\nwhere r_m(d) is the rank of document d in ranking method m (with ranks starting at 1), and k_rrf is a smoothing constant typically set to 60."
+    ],
+    "reference_answer": "The BM25 baseline fixes hyperparameters at k1 = 1.2 and b = 0.75, whereas the Reciprocal Rank Fusion (RRF) algorithm uses a smoothing constant of k_rrf = 60.",
+    "expected_behavior": "Synthesize retrieval hyperparameter values from DOC-03.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q22",
+    "category": "partial",
+    "split": "dev",
+    "question": "What is the vector dimension of all-MiniLM-L6-v2 in VISTAAR, and what learning rate was used during its initial pre-training?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c03",
+      "doc_01_vistaar_architecture_c04"
+    ],
+    "ground_truth_global_indices": [
+      3,
+      4
+    ],
+    "exact_evidence_spans": [
+      "Vector dimensionality: 384 dimensions"
+    ],
+    "reference_answer": "VISTAAR's all-MiniLM-L6-v2 model uses a vector dimensionality of 384 dimensions. However, the provided context does not contain information about the learning rate used during its initial pre-training.",
+    "expected_behavior": "Answer vector dimensionality; state that pre-training learning rate is not provided in context.",
+    "refusal_expected": "partial",
+    "partial_scope": {
+      "supported": "Vector dimensionality is 384 dimensions.",
+      "unsupported": "Initial pre-training learning rate."
+    }
+  },
+  {
+    "question_id": "PH2-Q24",
+    "category": "partial",
+    "split": "dev",
+    "question": "What is the smoothing constant k_rrf in Reciprocal Rank Fusion, and what is its mathematical proof of convergence?",
+    "target_documents": [
+      "doc_03_comparative_baselines.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_03_comparative_baselines_c03"
+    ],
+    "ground_truth_global_indices": [
+      30
+    ],
+    "exact_evidence_spans": [
+      "and k_rrf is a smoothing constant typically set to 60."
+    ],
+    "reference_answer": "In Reciprocal Rank Fusion, the smoothing constant k_rrf is typically set to 60. However, the provided context does not contain a mathematical proof of convergence for RRF.",
+    "expected_behavior": "Answer smoothing constant value; refuse mathematical proof of convergence.",
+    "refusal_expected": "partial",
+    "partial_scope": {
+      "supported": "k_rrf smoothing constant is set to 60.",
+      "unsupported": "Mathematical proof of convergence."
+    }
+  },
+  {
+    "question_id": "PH2-Q28",
+    "category": "insufficient",
+    "split": "dev",
+    "question": "What SQL schema and database connection string does VISTAAR use to store user session histories in PostgreSQL?",
+    "target_documents": [],
+    "ground_truth_chunk_ids": [],
+    "ground_truth_global_indices": [],
+    "exact_evidence_spans": [],
+    "reference_answer": "The provided context does not contain sufficient information to answer this question.",
+    "expected_behavior": "Complete refusal: VISTAAR corpus contains no PostgreSQL connection strings or user session SQL schemas.",
+    "refusal_expected": true,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q31",
+    "category": "insufficient",
+    "split": "dev",
+    "question": "How does VISTAAR configure the NLMS adaptive filter to eliminate acoustic echo during document vector embedding generation?",
+    "target_documents": [
+      "doc_05_acoustic_distractor.txt"
+    ],
+    "ground_truth_chunk_ids": [],
+    "ground_truth_global_indices": [],
+    "exact_evidence_spans": [],
+    "reference_answer": "The provided context does not contain sufficient information to answer this question. NLMS adaptive filters are described in the context exclusively for acoustic echo cancellation in telecommunications, not for document vector embedding generation.",
+    "expected_behavior": "Complete refusal / distractor rejection: Reject misleading combination of NLMS echo cancellation and document embedding.",
+    "refusal_expected": true,
+    "partial_scope": null
+  }
+]

@@ -1,0 +1,4 @@
+k,total_questions,successful_evaluations,failed_evaluations,skipped_evaluations,mean_hit_rate,mean_retrieval_precision,mean_retrieval_recall,mean_single_doc_recall,mean_multi_doc_recall,mean_mrr,mean_semantic_similarity,refusal_accuracy,partial_accuracy,mean_retrieval_latency_ms,mean_generation_latency_ms,mean_prompt_tokens_est,total_cost_est_usd,cost_measurement_type
+3,24,24,0,0,1.0,0.4333,0.7625,0.9,0.5417,0.95,0.8475,1.0,0.75,21.51,6132.2,788.1,0.001758,heuristic_estimate
+5,24,24,0,0,1.0,0.33,0.9167,1.0,0.8056,0.95,0.8491,1.0,0.75,16.99,3620.46,1291.7,0.002666,heuristic_estimate
+8,24,24,0,0,1.0,0.225,0.9708,1.0,0.9028,0.95,0.856,1.0,0.75,18.13,4966.7,2028.8,0.004005,heuristic_estimate

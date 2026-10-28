@@ -1,0 +1,65 @@
+[SYNTHETIC EVALUATION CORPUS - CONTROLLED BENCHMARK DATASET FOR VISTAAR RAG RESEARCH EVALUATION. NOT AN EMPIRICAL HARDWARE/SYSTEM SPECIFICATION.]
+
+# Hardware Profiling, Latency Benchmarks, and Index Scaling
+
+## 1. Vector Search Latency Benchmarks on IndexFlatL2
+In production environments, vector retrieval latency is governed by index architecture, vector dimensionality, and hardware execution constraints. A profiling benchmark of VISTAAR's faiss.IndexFlatL2 configuration across different vector collection scales yields the following baseline metrics:
+- Hardware testbed: Intel Xeon Platinum 8375C CPU @ 2.80GHz (32 vCPUs, 64 GB RAM), single-threaded execution.
+- Vector dimension: 384 dimensions (float32).
+- At 1,000 vectors: Retrieval latency averages 0.045 milliseconds for k=8.
+- At 10,000 vectors: Retrieval latency averages 0.420 milliseconds for k=8.
+- At 100,000 vectors: Retrieval latency scales linearly to 3.850 milliseconds for k=8.
+Because IndexFlatL2 performs an exhaustive O(N * d) distance calculation against all N stored vectors, latency grows strictly linearly with database size. Memory consumption for 100,000 vectors at 384 dimensions with 4-byte float32 elements equals exactly 153.6 megabytes of RAM.
+The CPU cache hierarchy easily accommodates smaller indices (e.g., 1,000 vectors require 1.53 MB, fitting comfortably inside L3 processor cache), enabling ultra-fast sub-millisecond search latencies.
+
+## 2. Inverted File and Product Quantization (IVF-PQ) Scaling
+When scaling beyond 500,000 vectors, exact IndexFlatL2 becomes memory-prohibitive in resource-constrained edge environments. VISTAAR profiles an alternative approximate nearest neighbor configuration: faiss.IndexIVF1024_PQ32.
+In this configuration:
+- The vector space is partitioned into 1,024 Voronoi cells using k-means clustering.
+- Product Quantization (PQ) compresses each 384-dimensional vector into 32 8-bit quantized byte codes, achieving an 87.5% reduction in vector memory footprint (from 1,536 bytes down to 32 bytes per vector).
+- Memory footprint for 100,000 vectors drops from 153.6 MB down to 19.2 MB.
+- Retrieval latency at 100,000 vectors with nprobe=16 drops to 0.680 milliseconds.
+However, this compression introduces an empirical recall penalty: Recall@10 drops by 4.2% relative to exact IndexFlatL2 due to quantization noise and boundary truncation.
+The parameter nprobe governs the number of neighboring Voronoi centroids inspected during search. Increasing nprobe from 16 to 64 restores 2.8% of the lost recall but quadruples search latency to 2.45 milliseconds.
+
+## 3. Embedding Model Inference Throughput and Quantization
+The computational throughput of the all-MiniLM-L6-v2 embedding model was evaluated on both CPU and GPU hardware under varying precision regimes:
+- On Intel Xeon CPU (batch size 32, FP32 precision): Throughput is 412 sentences per second with an average inference latency of 77.6 milliseconds per batch.
+- On Intel Xeon CPU with INT8 dynamic quantization via ONNX Runtime: Throughput increases to 780 sentences per second, reducing inference latency to 41.0 milliseconds per batch. Cosine similarity drift between FP32 and INT8 embeddings remains below 0.003 across benchmark validation sets.
+- On NVIDIA A10G GPU (batch size 64, FP16 precision): Throughput reaches 2,450 sentences per second with an average inference latency of 26.1 milliseconds per batch.
+Dynamic INT8 quantization quantizes feed-forward and attention projection matrix weights to 8-bit integers while maintaining activations in floating point, halving memory bandwidth demands during model forward passes.
+
+## 4. LLM Generation Latency, Throughput, and Token Economics
+The generative response phase represents the dominant contributor to overall system latency and operational cost. Profiling the Google Gemini API (gemini-3.1-flash-lite) under temperature 0.0 reveals:
+- Time-to-First-Token (TTFT): Averages 420 milliseconds under stable network conditions.
+- Generation decoding throughput: 68 tokens per second.
+- End-to-end generation latency for a standard 150-token answer: Approximately 2,620 milliseconds.
+Operational token economics for the Gemini flash-lite tier are tracked as follows:
+- Input context prompt pricing: $0.075 per 1,000,000 tokens.
+- Output generation pricing: $0.300 per 1,000,000 tokens.
+For a standard query with k=8 retrieved chunks (averaging approximately 1,800 prompt tokens) and a 150-token response, the total API cost per query is approximately $0.00018.
+In high-throughput enterprise deployments executing 100,000 queries per day, selecting k=3 instead of k=8 reduces prompt tokens by approximately 60%, lowering daily LLM API expenditure from $18.00 down to roughly $8.50.
+
+## 5. End-to-End System Bottleneck Analysis
+An end-to-end latency budget analysis of the VISTAAR pipeline across top-k values k in {3, 5, 8} demonstrates that vector retrieval is not the system bottleneck:
+- Vector search via IndexFlatL2 accounts for less than 0.2% of total transaction time.
+- Query embedding generation accounts for 3.5% to 5.0% of transaction time.
+- Gemini API network round-trip and autoregressive token decoding accounts for 94.8% to 96.3% of total transaction wall-clock time.
+Consequently, optimizing top-k primarily serves to control prompt token budget, avoid context dilution, and improve answer faithfulness rather than accelerating vector search execution.
+
+## 6. GPU Memory Constraints and Batch Processing Dynamics
+When deploying the embedding pipeline on GPU instances, vectorization throughput is bounded by available GPU High Bandwidth Memory (HBM). On an NVIDIA A10G accelerator with 24 GB of VRAM, the all-MiniLM-L6-v2 model occupies approximately 1.2 GB of memory in FP16 precision.
+Increasing the embedding batch size from 32 to 128 increases GPU compute saturation, improving overall throughput to 3,100 sentences per second. However, batch sizes exceeding 256 induce memory thrashing due to temporary activation allocations during multi-head attention matrix multiplication.
+
+## 7. Storage I/O Overhead and In-Memory Execution
+Because VISTAAR holds the FAISS index strictly in host memory (RAM), query processing incurs zero disk read operations or block device I/O waits during nearest neighbor retrieval. In contrast, on-disk vector stores relying on memory-mapped files (mmap) experience latency spikes when OS page cache misses force random access read operations from underlying solid-state drives.
+Benchmark measurements confirm that RAM-resident IndexFlatL2 delivers a 99th percentile (p99) retrieval latency variance of under 0.15 milliseconds, ensuring predictable execution timing for real-time interactive query pipelines.
+
+## 8. Thermal Throttling Dynamics and Sustained Workloads
+Under continuous high-concurrency evaluation workloads, sustained CPU utilization across all 32 vCPUs on the benchmark server causes thermal junction temperatures to rise to 82 degrees Celsius. The processor's dynamic frequency scaling reduces core clock speeds from 2.80 GHz to a throttled baseline of 2.35 GHz. This thermal throttling increases batch embedding latency by approximately 14.5%, demonstrating the importance of managed concurrency and hardware cooling during prolonged evaluation runs.
+
+## 9. Network Serialization Latency in Distributed Deployments
+When decoupling the retrieval backend and the web frontend into separate containerized microservices communicating over an internal Gigabit Ethernet network, serialization and HTTP payload transfer introduce an additional 2.5 to 4.1 milliseconds of overhead per query. Compressing the retrieved text payload using gzip reduces network transfer latency by 35% on queries retrieving k=8 chunks.
+
+## 10. Multi-Process Concurrency and Lock Contention in FAISS
+When serving simultaneous queries across multiple worker processes using Gunicorn or Uvicorn, shared access to an in-memory FAISS index requires careful thread synchronization. Because IndexFlatL2 search operations are read-only O(N*d) matrix multiplications, multiple search threads can query the index concurrently without write lock contention. However, concurrent document ingestion invokes index.add(), necessitating a mutual exclusion write lock that momentarily pauses active search queries for approximately 1.2 milliseconds per batch of 50 chunks.

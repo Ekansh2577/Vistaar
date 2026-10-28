@@ -8,10 +8,22 @@ import {
 import { mockConversations, mockDocuments, mockImages } from '../data/mockData'
 import { useApp } from '../context/AppContext'
 import { chatService, imageService } from '../services/api'
+import { useAuth } from '../context/AuthContext'
+
+function loadConversations(storageKey) {
+  try {
+    const saved = localStorage.getItem(storageKey)
+    return saved ? JSON.parse(saved) : mockConversations
+  } catch {
+    return mockConversations
+  }
+}
 
 export default function Chat() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const conversationStorageKey = `vistaar_conversations_${user?.id || 'guest'}`
   const {
     setUploadModal,
     uploadedDocuments,
@@ -22,8 +34,8 @@ export default function Chat() {
     checkBackendStatus
   } = useApp()
 
-  const [conversations, setConversations] = useState(mockConversations)
-  const [activeConvId, setActiveConvId] = useState('conv-1')
+  const [conversations, setConversations] = useState(() => loadConversations(conversationStorageKey))
+  const [activeConvId, setActiveConvId] = useState(() => loadConversations(conversationStorageKey)[0]?.id || 'conv-1')
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [typingStatusText, setTypingStatusText] = useState('')
@@ -39,6 +51,20 @@ export default function Chat() {
 
   const messagesEndRef = useRef(null)
   const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    const saved = loadConversations(conversationStorageKey)
+    setConversations(saved)
+    setActiveConvId(saved[0]?.id || 'conv-1')
+  }, [conversationStorageKey])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(conversationStorageKey, JSON.stringify(conversations))
+    } catch {
+      // Keep the in-memory conversation usable if browser storage is full or unavailable.
+    }
+  }, [conversationStorageKey, conversations])
 
   // Current conversation
   const currentConv = conversations.find((c) => c.id === activeConvId) || conversations[0]
@@ -251,7 +277,7 @@ export default function Chat() {
       // Check if evidence is missing or ungrounded
       const rawAns = response.answer || ''
       const lowerAns = rawAns.toLowerCase()
-      const isMissingEvidence =
+      const isMissingEvidence = response.needs_web_fallback ||
         lowerAns.includes('could not find this in the document') ||
         lowerAns.includes('no relevant information found')
 
@@ -259,7 +285,9 @@ export default function Chat() {
       let needsWebFallback = false
 
       if (isMissingEvidence) {
-        assistantContent = 'This information is not clearly stated in the uploaded document.'
+        if (!response.limitation) {
+          assistantContent = 'This information is not clearly stated in the uploaded document.'
+        }
         needsWebFallback = true
       }
 
@@ -269,14 +297,12 @@ export default function Chat() {
         content: assistantContent,
         originalQuestion: text,
         needsWebFallback: needsWebFallback,
-        sources: !needsWebFallback && uploadedDocuments && uploadedDocuments.length > 0
-          ? uploadedDocuments.map(d => ({
-              docId: d.id,
-              name: d.name,
-              page: 1,
-              relevance: 90,
-              type: d.type === 'pdf' ? 'pdf' : 'text',
-              textSnippet: 'Indexed into backend FAISS vector index (Top-8 retrieval).',
+        sources: !needsWebFallback
+          ? (response.sources || []).map(source => ({
+              name: source.filename,
+              page: source.page,
+              chunkId: source.chunk_id,
+              type: source.filename?.toLowerCase().endsWith('.pdf') ? 'pdf' : 'text',
             }))
           : [],
       }
@@ -737,7 +763,11 @@ export default function Chat() {
                           <div>
                             <div className="chat-source-name">{src.name}</div>
                             <div className="chat-source-page">
-                              {src.type === 'image' ? 'Direct Vision Grounding' : 'FAISS Index • Top-8 Chunks'}
+                              {src.type === 'image'
+                                ? 'Direct Vision Grounding'
+                                : src.page
+                                  ? `Page ${src.page} • ${src.chunkId}`
+                                  : `FAISS retrieval • ${src.chunkId}`}
                             </div>
                           </div>
                         </div>

@@ -1,0 +1,5 @@
+group,count,faithfulness_mean,faithfulness_std,answer_relevancy_mean,answer_relevancy_std,context_precision_mean,context_precision_std,context_recall_mean,context_recall_std,overall_mean,overall_std
+Overall (All 25 Questions),25,1.0,0.0,0.4239,0.2978,0.9,0.2828,1.0,0.0,0.831,0.0989
+Category: insufficient_evidence,6,1.0,0.0,0.109,0.0172,1.0,0.0,1.0,0.0,0.7772,0.0043
+Category: partial_evidence,7,1.0,0.0,0.2556,0.1931,0.8571,0.3499,1.0,0.0,0.7782,0.1006
+Category: sufficient_evidence,12,1.0,0.0,0.6796,0.1771,0.875,0.2976,1.0,0.0,0.8886,0.09

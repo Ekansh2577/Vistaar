@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { Search, Bell, Menu } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { useTheme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function Topbar({ title }) {
   const { toggleSidebar, addToast } = useApp()
   const { isEnlighten } = useTheme()
+  const { user } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchFocused, setSearchFocused] = useState(false)
   const searchInputRef = useRef(null)
@@ -101,14 +103,14 @@ export default function Topbar({ title }) {
           className="topbar-avatar"
           id="profile-avatar"
           onClick={() => navigate('/settings')}
-          title="Account Settings"
+          title={user?.email || 'Account Settings'}
           style={{
             background: isEnlighten
               ? 'linear-gradient(135deg, #7c3aed, #4f46e5)'
               : 'linear-gradient(135deg, #5b21b6, #3730a3)',
           }}
         >
-          EK
+          {(user?.fullName || user?.email || 'U').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
         </div>
       </div>
     </header>

@@ -21,6 +21,7 @@ export async function checkBackendHealth() {
     const timeoutId = setTimeout(() => controller.abort(), 4000)
     const res = await fetch(`${API_BASE_URL}/`, {
       method: 'GET',
+      credentials: 'include',
       signal: controller.signal,
     })
     clearTimeout(timeoutId)
@@ -41,7 +42,7 @@ export const documentService = {
    * Endpoint: POST /upload
    * Rate limit: 5/minute
    */
-  async upload(file) {
+  async upload(file, onProgress = () => {}) {
     if (!file) {
       throw new Error('Please select a file to upload.')
     }
@@ -63,6 +64,7 @@ export const documentService = {
     try {
       res = await fetch(`${API_BASE_URL}/upload`, {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       })
     } catch (networkErr) {
@@ -87,24 +89,59 @@ export const documentService = {
     }
 
     const data = await res.json()
-
-    // Backend returns: {"message": "PDF text not readable. Try another file."}
-    if (data.message && data.message.toLowerCase().includes('not readable')) {
-      throw new Error(data.message)
+    if (!data.job_id) {
+      throw new Error(data.detail || 'The backend did not start document processing.')
     }
 
-    // Successfully scheduled for background ingestion
+    const startedAt = Date.now()
+    let status
+    do {
+      await new Promise(resolve => setTimeout(resolve, 700))
+      let statusResponse
+      try {
+        statusResponse = await fetch(`${API_BASE_URL}/upload/${encodeURIComponent(data.job_id)}`, {
+          method: 'GET',
+          credentials: 'include',
+        })
+      } catch {
+        throw new Error('Lost connection while checking document processing status.')
+      }
+
+      if (!statusResponse.ok) {
+        let detail = `Could not check document status (HTTP ${statusResponse.status}).`
+        try {
+          const errorJson = await statusResponse.json()
+          if (errorJson.detail) detail = errorJson.detail
+        } catch {
+          // Keep the HTTP status when the response is not JSON.
+        }
+        throw new Error(detail)
+      }
+      status = await statusResponse.json()
+      onProgress(status)
+
+      if (Date.now() - startedAt > 15 * 60 * 1000) {
+        throw new Error('Document processing took too long. Check backend OCR and embedding configuration.')
+      }
+      if (status.status === 'failed') {
+        throw new Error(status.error || 'Document processing failed.')
+      }
+    } while (status.status !== 'ready')
+
     return {
       success: true,
-      message: data.message,
+      message: status.message,
+      indexedChunks: status.indexed_chunks,
+      warnings: status.warnings || [],
+      scannedPages: status.scanned_pages || 0,
       document: {
         id: `doc-${Date.now()}`,
         name: file.name,
         type: isPdf ? 'pdf' : file.type.includes('image') ? 'image' : 'text',
         size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
         uploadedAt: 'Just now',
-        status: 'Indexed in FAISS',
-        backendMessage: data.message,
+        status: 'Ready',
+        backendMessage: status.message,
       },
     }
   },
@@ -163,6 +200,7 @@ export const chatService = {
     try {
       res = await fetch(`${API_BASE_URL}/ask`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -192,6 +230,7 @@ export const chatService = {
     const data = await res.json()
     return {
       answer: data.answer,
+      sources: data.sources || [],
       timestamp: new Date().toISOString(),
     }
   },
@@ -211,6 +250,7 @@ export const chatService = {
     try {
       res = await fetch(`${API_BASE_URL}/search/web`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -305,6 +345,7 @@ export const imageService = {
     try {
       res = await fetch(`${API_BASE_URL}/ask-image`, {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       })
     } catch (networkErr) {

@@ -1,0 +1,521 @@
+[
+  {
+    "question_id": "Q01",
+    "source_scope": "Dsa.pdf",
+    "question": "What are the two authors named on the title page?",
+    "reference_answer": "Granville Barnett and Luca Del Tongo",
+    "evidence_anchor_terms": [
+      "Granville Barnett",
+      "Luca Del Tongo"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c000",
+      "Dsa_c013",
+      "Dsa_c014",
+      "Dsa_c015",
+      "Dsa_c016"
+    ]
+  },
+  {
+    "question_id": "Q02",
+    "source_scope": "Dsa.pdf",
+    "question": "Which data structure chapters are listed before sorting?",
+    "reference_answer": "Linked Lists, Binary Search Tree, Heap, Sets, Queues, and AVL Tree",
+    "evidence_anchor_terms": [
+      "Linked Lists",
+      "Binary Search Tree",
+      "Heap",
+      "AVL Tree"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c001",
+      "Dsa_c002",
+      "Dsa_c003",
+      "Dsa_c004",
+      "Dsa_c005",
+      "Dsa_c037",
+      "Dsa_c038",
+      "Dsa_c039",
+      "Dsa_c040",
+      "Dsa_c041",
+      "Dsa_c042",
+      "Dsa_c044",
+      "Dsa_c046",
+      "Dsa_c048",
+      "Dsa_c049",
+      "Dsa_c050",
+      "Dsa_c051",
+      "Dsa_c052",
+      "Dsa_c053",
+      "Dsa_c054",
+      "Dsa_c055",
+      "Dsa_c056",
+      "Dsa_c057",
+      "Dsa_c059",
+      "Dsa_c061",
+      "Dsa_c062",
+      "Dsa_c063",
+      "Dsa_c065",
+      "Dsa_c066",
+      "Dsa_c067",
+      "Dsa_c068",
+      "Dsa_c069",
+      "Dsa_c070",
+      "Dsa_c071",
+      "Dsa_c072",
+      "Dsa_c073",
+      "Dsa_c074",
+      "Dsa_c075",
+      "Dsa_c076",
+      "Dsa_c077",
+      "Dsa_c078",
+      "Dsa_c079",
+      "Dsa_c080",
+      "Dsa_c081",
+      "Dsa_c082",
+      "Dsa_c083",
+      "Dsa_c084",
+      "Dsa_c085",
+      "Dsa_c086",
+      "Dsa_c087",
+      "Dsa_c094",
+      "Dsa_c095",
+      "Dsa_c096",
+      "Dsa_c100",
+      "Dsa_c101",
+      "Dsa_c107",
+      "Dsa_c108",
+      "Dsa_c109",
+      "Dsa_c110",
+      "Dsa_c111",
+      "Dsa_c112",
+      "Dsa_c113",
+      "Dsa_c114",
+      "Dsa_c115",
+      "Dsa_c117",
+      "Dsa_c118",
+      "Dsa_c166",
+      "Dsa_c167"
+    ]
+  },
+  {
+    "question_id": "Q03",
+    "source_scope": "Dsa.pdf",
+    "question": "Which four tree traversal methods are listed for a binary search tree?",
+    "reference_answer": "Preorder, Postorder, Inorder, and Breadth First",
+    "evidence_anchor_terms": [
+      "Preorder",
+      "Postorder",
+      "Inorder",
+      "Breadth First"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c003",
+      "Dsa_c064",
+      "Dsa_c065",
+      "Dsa_c066",
+      "Dsa_c067",
+      "Dsa_c068",
+      "Dsa_c094",
+      "Dsa_c095"
+    ]
+  },
+  {
+    "question_id": "Q04",
+    "source_scope": "Dsa.pdf",
+    "question": "Which sorting algorithms are covered in the sorting chapter?",
+    "reference_answer": "Bubble, Merge, Quick, Insertion, Shell, and Radix Sort",
+    "evidence_anchor_terms": [
+      "Bubble Sort",
+      "Merge Sort",
+      "Quick Sort",
+      "Radix Sort"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c005",
+      "Dsa_c006",
+      "Dsa_c019",
+      "Dsa_c020",
+      "Dsa_c118",
+      "Dsa_c119",
+      "Dsa_c120",
+      "Dsa_c121",
+      "Dsa_c122",
+      "Dsa_c125",
+      "Dsa_c126",
+      "Dsa_c127",
+      "Dsa_c129",
+      "Dsa_c130",
+      "Dsa_c171"
+    ]
+  },
+  {
+    "question_id": "Q05",
+    "source_scope": "Dsa.pdf",
+    "question": "What topics are included in the numeric algorithms chapter?",
+    "reference_answer": "Primality testing, base conversions, greatest common denominator, maximum value for a base with N digits, and factorial",
+    "evidence_anchor_terms": [
+      "Primality Test",
+      "Base conversions",
+      "greatest common denominator",
+      "Factorial"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c006",
+      "Dsa_c029",
+      "Dsa_c130",
+      "Dsa_c131",
+      "Dsa_c132",
+      "Dsa_c133",
+      "Dsa_c135",
+      "Dsa_c136"
+    ]
+  },
+  {
+    "question_id": "Q06",
+    "source_scope": "Dsa.pdf",
+    "question": "What is the title of Appendix D?",
+    "reference_answer": "Testing",
+    "evidence_anchor_terms": [
+      "D Testing",
+      "What constitutes a unit test"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c008",
+      "Dsa_c175"
+    ]
+  },
+  {
+    "question_id": "Q07",
+    "source_scope": "Dsa.pdf",
+    "question": "What complexity considerations does the preface say are key when selecting a data structure or algorithm?",
+    "reference_answer": "Run time complexity and space requirements",
+    "evidence_anchor_terms": [
+      "run time complexity",
+      "space requirements"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c012",
+      "Dsa_c017",
+      "Dsa_c018",
+      "Dsa_c019",
+      "Dsa_c078",
+      "Dsa_c093",
+      "Dsa_c094",
+      "Dsa_c096",
+      "Dsa_c100",
+      "Dsa_c124",
+      "Dsa_c132",
+      "Dsa_c143",
+      "Dsa_c151"
+    ]
+  },
+  {
+    "question_id": "Q08",
+    "source_scope": "Dsa.pdf",
+    "question": "Which programming languages are mentioned as targets for porting the pseudocode?",
+    "reference_answer": "C++, C#, and Java",
+    "evidence_anchor_terms": [
+      "C++",
+      "C#",
+      "Java"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "Dsa_c011",
+      "Dsa_c012",
+      "Dsa_c013",
+      "Dsa_c024",
+      "Dsa_c025",
+      "Dsa_c026",
+      "Dsa_c027",
+      "Dsa_c030",
+      "Dsa_c036",
+      "Dsa_c106",
+      "Dsa_c162",
+      "Dsa_c164",
+      "Dsa_c167",
+      "Dsa_c174",
+      "Dsa_c175"
+    ]
+  },
+  {
+    "question_id": "Q09",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "What is Spring Boot described as being used to create?",
+    "reference_answer": "Standalone, production-ready Spring applications and microservices",
+    "evidence_anchor_terms": [
+      "stand-alone",
+      "production ready",
+      "microservice"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q10",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "What are the stated goals of Spring Boot?",
+    "reference_answer": "Avoid complex XML configuration, make production-ready apps easier, reduce development time, and simplify getting started",
+    "evidence_anchor_terms": [
+      "avoid complex XML configuration",
+      "production ready",
+      "reduce the development time"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q11",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which annotation is described as the entry point marker for a Spring Boot application?",
+    "reference_answer": "@SpringBootApplication",
+    "evidence_anchor_terms": [
+      "@SpringBootApplication"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q12",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which three capabilities are included by @SpringBootApplication according to the tutorial?",
+    "reference_answer": "Auto-Configuration, Component Scan, and Spring Boot Configuration",
+    "evidence_anchor_terms": [
+      "Auto-Configuration",
+      "Component Scan",
+      "Spring Boot Configuration"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q13",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "What naming pattern do Spring Boot starter dependencies follow?",
+    "reference_answer": "spring-boot-starter-*",
+    "evidence_anchor_terms": [
+      "spring-boot-starter-"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q14",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which starter is listed for writing REST endpoints?",
+    "reference_answer": "spring-boot-starter-web",
+    "evidence_anchor_terms": [
+      "spring-boot-starter-web"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q15",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which HTTP operations are covered in the RESTful web services section?",
+    "reference_answer": "GET, POST, PUT, and DELETE",
+    "evidence_anchor_terms": [
+      "GET API",
+      "POST API",
+      "PUT API",
+      "DELETE API"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q16",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which database options are mentioned in the database handling chapter?",
+    "reference_answer": "H2, MySQL, and Redis",
+    "evidence_anchor_terms": [
+      "H2 database",
+      "MySQL",
+      "Redis"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q17",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which tools or topics are listed for unit testing Spring Boot applications?",
+    "reference_answer": "Mockito and REST controller unit tests",
+    "evidence_anchor_terms": [
+      "Mockito",
+      "REST Controller Unit Test"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q18",
+    "source_scope": "Spring Boot Tutorial.pdf",
+    "question": "Which security topics are covered near the end of the tutorial?",
+    "reference_answer": "Securing web applications and OAuth2 with JWT",
+    "evidence_anchor_terms": [
+      "Securing Web Applications",
+      "OAuth2 with JWT"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q19",
+    "source_scope": "css.pdf",
+    "question": "What does CSS stand for in the uploaded notes?",
+    "reference_answer": "Cascading Style Sheet",
+    "evidence_anchor_terms": [
+      "Cascading Style Sheet"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "css_c000",
+      "css_c004",
+      "css_c005",
+      "css_c006",
+      "css_c007",
+      "css_c008",
+      "css_c010"
+    ]
+  },
+  {
+    "question_id": "Q20",
+    "source_scope": "css.pdf",
+    "question": "What are the three types of stylesheets listed in the notes?",
+    "reference_answer": "Inline, Internal, and External stylesheets",
+    "evidence_anchor_terms": [
+      "Inline stylesheet",
+      "Internal stylesheet",
+      "External stylesheet"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "css_c003",
+      "css_c005",
+      "css_c006",
+      "css_c007"
+    ]
+  },
+  {
+    "question_id": "Q21",
+    "source_scope": "css.pdf",
+    "question": "Which CSS properties are listed under text designing properties?",
+    "reference_answer": "color, text-align, font-size, font-family, font-weight, font-style, text-transform, letter-spacing, word-spacing, line-height, and text-indent",
+    "evidence_anchor_terms": [
+      "text-align",
+      "font-size",
+      "font-family",
+      "text-transform"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "css_c002",
+      "css_c003",
+      "css_c010",
+      "css_c011"
+    ]
+  },
+  {
+    "question_id": "Q22",
+    "source_scope": "css.pdf",
+    "question": "Which selectors are explained in the CSS selector chapter?",
+    "reference_answer": "Element, ID, and Class selectors",
+    "evidence_anchor_terms": [
+      "Element Selector",
+      "Id Selector",
+      "Class Selector"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "css_c006",
+      "css_c007",
+      "css_c013",
+      "css_c014"
+    ]
+  },
+  {
+    "question_id": "Q23",
+    "source_scope": "css.pdf",
+    "question": "Which CSS properties are listed as dimensional properties?",
+    "reference_answer": "width, height, border-width, border-style, border-color, float, padding, and margin variants",
+    "evidence_anchor_terms": [
+      "border-width",
+      "border-style",
+      "padding",
+      "margin"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "css_c005",
+      "css_c011"
+    ]
+  },
+  {
+    "question_id": "Q24",
+    "source_scope": "css.pdf",
+    "question": "Which properties are included under background properties?",
+    "reference_answer": "background-color, background-image, background-size, background-position, background-repeat, and background-attachment",
+    "evidence_anchor_terms": [
+      "Background-color",
+      "Background-image",
+      "Background-size",
+      "Background-repeat"
+    ],
+    "candidate_ground_truth_chunk_ids": [
+      "css_c007",
+      "css_c008",
+      "css_c010",
+      "css_c012",
+      "css_c013"
+    ]
+  },
+  {
+    "question_id": "Q25",
+    "source_scope": "CSS cross-doc",
+    "question": "Which of the uploaded documents discusses REST endpoints?",
+    "reference_answer": "The Spring Boot tutorial",
+    "evidence_anchor_terms": [
+      "spring-boot-starter-web",
+      "REST Endpoint"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q26",
+    "source_scope": "Cross-doc",
+    "question": "Which document includes a chapter on sorting algorithms?",
+    "reference_answer": "Dsa.pdf",
+    "evidence_anchor_terms": [
+      "Sorting",
+      "Bubble Sort",
+      "Merge Sort"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q27",
+    "source_scope": "Cross-doc",
+    "question": "Which document lists inline, internal, and external stylesheets?",
+    "reference_answer": "css.pdf",
+    "evidence_anchor_terms": [
+      "Inline stylesheet",
+      "Internal stylesheet",
+      "External stylesheet"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q28",
+    "source_scope": "Cross-doc",
+    "question": "Which uploaded document discusses OAuth2 with JWT?",
+    "reference_answer": "The Spring Boot tutorial",
+    "evidence_anchor_terms": [
+      "OAuth2",
+      "JWT Token"
+    ],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q29",
+    "source_scope": "Unanswerable",
+    "question": "What is VISTAAR's measured production latency on the user's laptop?",
+    "reference_answer": "Not supported by these documents; should refuse",
+    "evidence_anchor_terms": [],
+    "candidate_ground_truth_chunk_ids": []
+  },
+  {
+    "question_id": "Q30",
+    "source_scope": "Unanswerable",
+    "question": "What exact Gemini API cost was billed for processing these three PDFs?",
+    "reference_answer": "Not supported by these documents; should refuse",
+    "evidence_anchor_terms": [],
+    "candidate_ground_truth_chunk_ids": []
+  }
+]

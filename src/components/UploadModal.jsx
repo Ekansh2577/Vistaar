@@ -85,15 +85,25 @@ export default function UploadModal() {
 
     try {
       setUploadProgress(50)
-      setUploadStageText('Extracting text and triggering FAISS indexing task...')
+    const result = await documentService.upload(selectedFile, (status) => {
+      setUploadStageText(status.stage || 'Processing document...')
+      if (status.stage?.toLowerCase().includes('scanned')) setUploadProgress(60)
+      else if (status.stage?.toLowerCase().includes('index')) setUploadProgress(85)
+      else setUploadProgress(55)
+    })
 
-      const result = await documentService.upload(selectedFile)
+    setUploadProgress(100)
+    setUploadStageText(`Document indexed and ready for questions (${result.indexedChunks} chunks).`)
 
-      setUploadProgress(100)
-      setUploadStageText('Document accepted! Chunks and embeddings are being generated in the background.')
-
-      addUploadedDocument(result.document)
+    addUploadedDocument(result.document)
+    if (result.warnings.length > 0) {
+      addToast(
+        `Indexed with limitations: ${result.warnings.join(' ')}`,
+        'info'
+      )
+    } else {
       addToast(result.message || `Successfully uploaded "${selectedFile.name}"`, 'success')
+    }
 
       setTimeout(() => {
         setIsUploading(false)

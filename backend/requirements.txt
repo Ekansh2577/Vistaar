@@ -5,7 +5,13 @@ python-multipart
 faiss-cpu
 sentence-transformers
 PyPDF2
+PyMuPDF
+Pillow
+pytesseract
 slowapi
 google-genai
 python-dotenv
 ddgs
+pwdlib[argon2]
+httpx
+SQLAlchemy>=2.0,<3.0

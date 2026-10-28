@@ -1,0 +1,327 @@
+[
+  {
+    "id": "Q01",
+    "category": "sufficient_evidence",
+    "user_input": "What chunk size is configured for text partitioning in VISTAAR?",
+    "reference": "Text is partitioned into overlapping chunks of 1000 characters.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "The text is partitioned into overlapping chunks of 1000 characters.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 2.362
+  },
+  {
+    "id": "Q02",
+    "category": "sufficient_evidence",
+    "user_input": "What is the character overlap between adjacent text chunks?",
+    "reference": "The configured character overlap between adjacent chunks is 200 characters.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 46.693
+  },
+  {
+    "id": "Q03",
+    "category": "sufficient_evidence",
+    "user_input": "Which transformer model is used to generate dense embeddings in VISTAAR?",
+    "reference": "Dense embeddings are generated using the all-MiniLM-L6-v2 transformer model.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "The all-MiniLM-L6-v2 transformer model is used to generate dense embeddings in VISTAAR.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 26.757
+  },
+  {
+    "id": "Q04",
+    "category": "sufficient_evidence",
+    "user_input": "How many dimensions do the generated embeddings have?",
+    "reference": "The generated embeddings have 384 dimensions.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "The generated embeddings have 384 dimensions.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.046
+  },
+  {
+    "id": "Q05",
+    "category": "sufficient_evidence",
+    "user_input": "What type of FAISS index is used to store document vector representations?",
+    "reference": "Vector representations are stored in a FAISS IndexFlatL2 index.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "The FAISS IndexFlatL2 index is used to store document vector representations.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 8.207
+  },
+  {
+    "id": "Q06",
+    "category": "sufficient_evidence",
+    "user_input": "What distance metric does the FAISS index compute during similarity search?",
+    "reference": "The FAISS IndexFlatL2 index performs exact Euclidean distance search.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "The FAISS index computes exact Euclidean distance.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 8.751
+  },
+  {
+    "id": "Q07",
+    "category": "sufficient_evidence",
+    "user_input": "How many top semantic chunks are retrieved when a user submits a query?",
+    "reference": "VISTAAR retrieves the top-8 most similar semantic chunks for each query.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "VISTAAR retrieves the top-8 most similar semantic chunks.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 23.041
+  },
+  {
+    "id": "Q08",
+    "category": "sufficient_evidence",
+    "user_input": "What temperature parameter is used when passing the prompt to the Gemini model?",
+    "reference": "The prompt is passed to the Gemini model with the temperature set to 0.0.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "The temperature is set to 0.0.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 3.295
+  },
+  {
+    "id": "Q09",
+    "category": "sufficient_evidence",
+    "user_input": "What exact message does the model return when context does not contain the answer?",
+    "reference": "The model responds with: 'I could not find this in the document.'",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 4.413
+  },
+  {
+    "id": "Q10",
+    "category": "sufficient_evidence",
+    "user_input": "What is the rate limit for the document upload endpoint?",
+    "reference": "The upload endpoint is rate limited to 5 requests per minute.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "The upload endpoint is rate limited to 5 requests per minute.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 20.227
+  },
+  {
+    "id": "Q11",
+    "category": "sufficient_evidence",
+    "user_input": "What is the rate limit configured for the question answering endpoint?",
+    "reference": "The question answering endpoint is rate limited to 10 requests per minute.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "The question answering endpoint is rate limited to 10 requests per minute.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.792
+  },
+  {
+    "id": "Q12",
+    "category": "sufficient_evidence",
+    "user_input": "What is the minimum character threshold for uploaded documents to be accepted?",
+    "reference": "Documents with less than 50 characters of readable text are rejected during ingestion.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "Documents with less than 50 characters of readable text are rejected during ingestion.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.001
+  },
+  {
+    "id": "Q13",
+    "category": "partial_evidence",
+    "user_input": "Does VISTAAR use sentence-transformers, and what specific GPU acceleration does it require?",
+    "reference": "VISTAAR uses the all-MiniLM-L6-v2 transformer model for embeddings, but the document does not specify GPU acceleration requirements.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 0.891
+  },
+  {
+    "id": "Q14",
+    "category": "partial_evidence",
+    "user_input": "How is document text extracted page by page, and does it include Tesseract OCR?",
+    "reference": "Text is extracted page by page from uploaded documents, but the document does not mention Tesseract OCR support.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.001
+  },
+  {
+    "id": "Q15",
+    "category": "partial_evidence",
+    "user_input": "What distance metric is used by FAISS and what is its mathematical formula?",
+    "reference": "The FAISS index uses exact Euclidean distance search, but the document does not write out the mathematical formula.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "The FAISS index uses exact Euclidean distance. I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.186
+  },
+  {
+    "id": "Q16",
+    "category": "partial_evidence",
+    "user_input": "How are prompt templates constructed and what is the full verbatim system prompt for Gemini?",
+    "reference": "Retrieved chunks are synthesized into a strict prompt template for Gemini, but the document does not provide the full verbatim system prompt.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 0.885
+  },
+  {
+    "id": "Q17",
+    "category": "partial_evidence",
+    "user_input": "What happens when a user asks a question before any document has been uploaded?",
+    "reference": "The document specifies that questions are answered using retrieved context, but does not detail the exact pre-upload error string.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.07
+  },
+  {
+    "id": "Q18",
+    "category": "partial_evidence",
+    "user_input": "What file formats can be uploaded to VISTAAR for document question answering?",
+    "reference": "The document states that documents are uploaded and processed page by page, but does not list all specific file extensions.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 0.909
+  },
+  {
+    "id": "Q19",
+    "category": "partial_evidence",
+    "user_input": "Why is the temperature set to 0.0 and what sampling algorithm is used?",
+    "reference": "The temperature is configured at 0.0 for deterministic output, but the specific sampling algorithm is not elaborated.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.188
+  },
+  {
+    "id": "Q20",
+    "category": "insufficient_evidence",
+    "user_input": "What is the monthly pricing tier for VISTAAR enterprise license?",
+    "reference": "I could not find this in the document.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 3.203
+  },
+  {
+    "id": "Q21",
+    "category": "insufficient_evidence",
+    "user_input": "What is the warranty and return policy for agricultural drones?",
+    "reference": "I could not find this in the document.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 0.837
+  },
+  {
+    "id": "Q22",
+    "category": "insufficient_evidence",
+    "user_input": "What are the clinical diagnostic criteria for type 2 diabetes?",
+    "reference": "I could not find this in the document.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 2.997
+  },
+  {
+    "id": "Q23",
+    "category": "insufficient_evidence",
+    "user_input": "How do you deploy VISTAAR on an Amazon EKS Kubernetes cluster?",
+    "reference": "I could not find this in the document.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 0.946
+  },
+  {
+    "id": "Q24",
+    "category": "insufficient_evidence",
+    "user_input": "What training dataset was used to pre-train the Gemini 3 Flash model?",
+    "reference": "I could not find this in the document.",
+    "retrieved_contexts": [
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion.",
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe"
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 1.254
+  },
+  {
+    "id": "Q25",
+    "category": "insufficient_evidence",
+    "user_input": "How does VISTAAR compute ROUGE-L and BLEU scores for evaluation?",
+    "reference": "I could not find this in the document.",
+    "retrieved_contexts": [
+      "VISTAAR Platform Documentation and System Guide\n\n1. Overview\nVISTAAR is an enterprise-grade document intelligence platform that bridges dense vector retrieval with modern generative AI models. It processes unstructured enterprise documents, indexes them into FAISS, and answers questions strictly grounded in the retrieved context.\n\n2. Ingestion and Indexing\nWhen documents are uploaded to the VISTAAR backend, text is extracted page by page. The text is partitioned into overlapping chunks of 1000 characters with 200 character overlaps. Dense embeddings of 384 dimensions are generated using the all-MiniLM-L6-v2 transformer model. These vector representations are stored in a FAISS IndexFlatL2 index for exact Euclidean distance search.\n\n3. Query Retrieval and Generation\nWhen a user asks a question, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with tempe",
+      "on, VISTAAR computes the query embedding and retrieves the top-8 most similar semantic chunks. The retrieved text is synthesized into a strict prompt template and passed to the Gemini model with temperature set to 0.0. If the context does not contain the answer, the model responds with: 'I could not find this in the document.'\n\n4. System Constraints\nThe upload endpoint is rate limited to 5 requests per minute, and question answering is rate limited to 10 requests per minute. Documents with less than 50 characters of readable text are rejected during ingestion."
+    ],
+    "response": "I could not find this in the document.",
+    "num_retrieved_chunks": 2,
+    "latency_seconds": 0.938
+  }
+]

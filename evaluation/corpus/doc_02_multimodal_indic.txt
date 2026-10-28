@@ -1,0 +1,52 @@
+[SYNTHETIC EVALUATION CORPUS - CONTROLLED BENCHMARK DATASET FOR VISTAAR RAG RESEARCH EVALUATION. NOT AN EMPIRICAL HARDWARE/SYSTEM SPECIFICATION.]
+
+# Multimodal Ingestion and Indic Processing Pipeline
+
+## 1. Indic Multilingual Processing Architecture
+VISTAAR incorporates specialized preprocessing components designed to address the linguistic and morphological complexities of Indic languages. The pipeline specifically supports high-resource and medium-resource Indian languages across the Indo-Aryan and Dravidian language families, including Hindi, Marathi, Bengali, Tamil, Telugu, and Kannada.
+Dravidian languages exhibit agglutinative morphology where grammatical relationships are expressed through extensive suffix concatenation, resulting in long word forms and out-of-vocabulary challenges for standard subword tokenizers. In Indo-Aryan languages like Hindi and Marathi, script processing must handle complex conjunct consonants, matra reordering, and Zero-Width Joiner (ZWJ) or Zero-Width Non-Joiner (ZWNJ) unicode sequences.
+VISTAAR applies a unicode normalization pre-filter using canonical decomposition followed by canonical composition (NFC normalization) to standardize composite glyphs before chunking.
+Without NFC normalization, identical visual characters can be encoded through differing byte sequences, fragmenting word embeddings and degrading nearest-neighbor retrieval in the vector space.
+
+## 2. OCR Extraction Pipeline for Scanned Manuscripts
+To ingest historical archives, administrative notices, and printed government circulars, VISTAAR incorporates an Optical Character Recognition (OCR) pipeline. Scanned documents and image files (.png, .jpeg, .tiff) are processed through a four-stage visual normalization and character recognition workflow:
+1. Grayscale conversion and Gaussian blur filtering (kernel size 3x3) to suppress sensor noise.
+2. Adaptive Otsu thresholding to segment dark text glyphs from non-uniform, aged paper backgrounds.
+3. Deskewing via Radon transform analysis, correcting rotational page misalignments within an angular range of -15 degrees to +15 degrees.
+4. Optical character extraction using a custom-tuned Tesseract 5.3 engine equipped with specialized fast-integer Indic language models (tessdata_fast).
+The OCR module outputs raw text along with bounding box coordinates and word-level recognition confidence scores. A confidence threshold filter of 72.0% is applied: words recognized with confidence below 72.0% are flagged with an uncertainty marker to alert downstream semantic validators.
+The pipeline also discards isolated stray pixel clusters smaller than 4x4 pixels to eliminate speckle artifacts resulting from degraded paper scans.
+
+## 3. Document Layout Analysis and Tabular Extraction Protocol
+Many official documents feature multi-column layouts and structured numerical tables. Standard horizontal text extraction frequently scrambles multi-column layouts by concatenating text across columns. VISTAAR mitigates this through a heuristic layout analyzer based on morphological kernels.
+Horizontal morphological kernels (size 1x40 pixels) detect horizontal table ruling lines, while vertical kernels (size 40x1 pixels) detect column dividers. The intersection of detected lines defines individual tabular grid cells. Once table geometry is resolved, cell contents are extracted and reformatted into standardized Markdown table syntax prior to sliding-window chunking.
+This conversion preserves row-column alignment and ensures that tabular headers remain explicitly coupled with their corresponding cell data. When a table spans across multiple physical pages, the layout analyzer detects matching header structures and merges the continuous rows into a singular structured Markdown entity before emitting it to the chunker.
+
+## 4. Speech and Audio Transcription Modality
+For audio content such as agricultural advisories and public service announcements, VISTAAR features a speech-to-text ingestion module. The speech subsystem handles single-channel audio recorded at sampling rates between 8 kHz and 48 kHz, standardized to 16 kHz 16-bit PCM format.
+Audio transcription is performed using a Conformer-CTC acoustic architecture trained on 10,000 hours of multilingual Indian audio covering 12 regional languages. The transcription engine generates word-level timestamps and inserts punctuation markers using a recurrent punctuation restoration model.
+An automated Word Error Rate (WER) filtering gate discards audio segments exhibiting estimated transcript perplexity exceeding 18.5%. Transcribed speech segments are appended with an audio modality metadata tag indicating the source audio filename, timestamp offset, and speaker turn identifier before entering the sliding-window chunker.
+Segments failing the 18.5% threshold are directed to an operator quarantine log, preventing garbled acoustic transcripts from contaminating the retrieval index with phonetic noise.
+
+## 5. Cross-Lingual Semantic Embedding Alignment
+To enable cross-lingual retrieval where a user queries in an Indic language (e.g., Hindi) to retrieve relevant passages written in English, VISTAAR configures a cross-lingual embedding extension. In this configuration, the standard English all-MiniLM-L6-v2 model is substituted with paraphrase-multilingual-MiniLM-L12-v2.
+This multilingual model shares the 384-dimensional vector space with the baseline model but is trained across 50 languages using multilingual teacher-student distillation. Cross-lingual mapping achieves an alignment cosine similarity of 0.84 on parallel Indo-Aryan evaluation corpora.
+In the baseline VISTAAR configuration, however, cross-lingual embeddings remain optional, and the primary deployment operates on all-MiniLM-L6-v2 focused on English document ingestion.
+The cross-lingual alignment space ensures that conceptually identical queries expressed in Hindi or English project into close Euclidean neighborhoods within the FAISS IndexFlatL2 index.
+
+## 6. Complex Typography Preprocessing and DPI Normalization
+Scanned historical manuscripts frequently exhibit uneven typography and ink bleed-through from reverse pages. To enhance character legibility prior to OCR, VISTAAR implements local adaptive Sauvola thresholding with a dynamic window radius of 15 pixels and a threshold weighting parameter k_s = 0.2.
+All scanned image inputs are normalized to 300 Dots Per Inch (DPI) resolution via bicubic resampling. Input images with resolutions lower than 150 DPI are upscaled, while high-resolution scans exceeding 600 DPI are downsampled to prevent excessive computational overhead in the Tesseract morphological extraction stage.
+
+## 7. Audio Pre-Filtering and Voice Activity Detection
+The audio ingestion subsystem precedes Conformer-CTC inference with an energy-based Voice Activity Detection (VAD) module. The VAD module partitions continuous audio streams into discrete speech utterances based on a 30-millisecond frame energy threshold.
+Periods of non-speech silence exceeding 800 milliseconds trigger an utterance segmentation boundary. This segmentation eliminates long stretches of ambient microphone silence, reducing unnecessary ASR inference overhead and ensuring that generated transcripts correspond to coherent semantic speech passages.
+
+## 8. OCR Post-Correction via Statistical Language Modeling
+Raw OCR output from degraded Indic texts frequently contains character confusion errors, such as confusions between similar Devanagari consonants (e.g., 'ba' and 'va', or 'dha' and 'gha'). To correct these errors before text chunking, VISTAAR routes low-confidence spans through an n-gram character language model. The character language model evaluates candidate replacement characters based on 5-gram transition probabilities derived from a corpus of 50 million clean sentences. Character substitutions that improve the language model perplexity score by more than 25% are automatically adopted, reducing character error rate by an estimated 3.4%.
+
+## 9. Indic Script Font Rendering and Glyph Normalization
+Digital government documents in India often utilize legacy non-Unicode fonts (such as Kruti Dev or Shree Lipi) rather than standard UTF-8 Unicode Devanagari. VISTAAR embeds a font detection heuristic that inspects character distribution anomalies in extracted strings. When legacy font encodings are detected, the system applies a character mapping lookup table that converts ASCII-mapped glyph codes back to their standard Unicode codepoints before tokenization, preventing corrupted text representations from entering the FAISS vector index.
+
+## 10. Complex Ligature Disambiguation for Rare Dravidian Scripts
+In historical Malayalam, Grantha, and Old Kannada epigraphical inscriptions, complex consonant ligatures with stacked subscript glyphs frequently cause segmentation failures in standard OCR kernels. VISTAAR integrates a contextual ligature disambiguation grammar based on classical sandhi split rules. When an ambiguous glyph sequence is detected, the grammar evaluates phonetic validity according to traditional phonotactic constraints, discarding orthographically invalid consonant stacks before generating word candidates.

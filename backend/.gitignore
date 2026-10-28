@@ -5,4 +5,7 @@ __pycache__/
 .cache/
 *.safetensors
 *.bin
+*.sqlite3
+*.sqlite3-*
+*.db
 .idea/

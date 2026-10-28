@@ -1,0 +1,567 @@
+[
+  {
+    "question_id": "PH2-Q01",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What chunk size, overlap size, and step stride does VISTAAR use in its sliding-window chunking protocol?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c02"
+    ],
+    "ground_truth_global_indices": [
+      2
+    ],
+    "exact_evidence_spans": [
+      "Window size: 1000 characters\n- Overlap size: 200 characters\n- Stride: 800 characters",
+      "taking a slice of length 1000 starting at index i: chunk = text[i:i + 1000]."
+    ],
+    "reference_answer": "VISTAAR uses a window size of 1000 characters, an overlap size of 200 characters, and a step stride of 800 characters in its sliding-window chunking protocol.",
+    "expected_behavior": "Direct factual extraction from DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q02",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What embedding model and vector dimensionality are configured in the baseline VISTAAR embedding module?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c03",
+      "doc_01_vistaar_architecture_c04"
+    ],
+    "ground_truth_global_indices": [
+      3,
+      4
+    ],
+    "exact_evidence_spans": [
+      "VISTAAR integrates the sentence-transformers library using the pre-trained all-MiniLM-L6-v2 model.",
+      "Vector dimensionality: 384 dimensions"
+    ],
+    "reference_answer": "The baseline VISTAAR embedding module uses the sentence-transformers all-MiniLM-L6-v2 model with a vector dimensionality of 384 dimensions.",
+    "expected_behavior": "Direct factual extraction from DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q04",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What temperature setting and fallback cascade of Gemini models are defined in the VISTAAR QA service?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c08"
+    ],
+    "ground_truth_global_indices": [
+      8
+    ],
+    "exact_evidence_spans": [
+      "1. gemini-3.1-flash-lite\n2. gemini-3.5-flash-lite\n3. gemini-flash-lite-latest\n4. gemini-3.5-flash\n5. gemini-3-flash-preview",
+      "The generation configuration enforces a strict temperature parameter of 0.0."
+    ],
+    "reference_answer": "The VISTAAR QA service enforces a temperature parameter of 0.0 with a fallback cascade of five Gemini models: gemini-3.1-flash-lite, gemini-3.5-flash-lite, gemini-flash-lite-latest, gemini-3.5-flash, and gemini-3-flash-preview.",
+    "expected_behavior": "Direct factual extraction from DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q05",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What confidence threshold is applied to word recognition in VISTAAR's OCR pipeline, and what happens to words below this threshold?",
+    "target_documents": [
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c02",
+      "doc_02_multimodal_indic_c03"
+    ],
+    "ground_truth_global_indices": [
+      17,
+      18
+    ],
+    "exact_evidence_spans": [
+      "A confidence threshold filter of 72.0% is applied: words recognized with confidence below 72.0% are flagged with an uncertainty marker to alert downstream semantic validators."
+    ],
+    "reference_answer": "A confidence threshold of 72.0% is applied; words recognized with confidence below 72.0% are flagged with an uncertainty marker.",
+    "expected_behavior": "Direct factual extraction from DOC-02.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q06",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What morphological kernel dimensions are utilized to detect table borders in VISTAAR's document layout analyzer?",
+    "target_documents": [
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c03"
+    ],
+    "ground_truth_global_indices": [
+      18
+    ],
+    "exact_evidence_spans": [
+      "Horizontal morphological kernels (size 1x40 pixels) detect horizontal table ruling lines, while vertical kernels (size 40x1 pixels) detect column dividers."
+    ],
+    "reference_answer": "Horizontal morphological kernels of size 1x40 pixels detect horizontal ruling lines, and vertical kernels of size 40x1 pixels detect column dividers.",
+    "expected_behavior": "Direct factual extraction from DOC-02.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q08",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What formula and smoothing constant are used in Reciprocal Rank Fusion (RRF) for hybrid retrieval?",
+    "target_documents": [
+      "doc_03_comparative_baselines.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_03_comparative_baselines_c03"
+    ],
+    "ground_truth_global_indices": [
+      30
+    ],
+    "exact_evidence_spans": [
+      "RRF_Score(d) = sum_{m in M} 1 / (k_rrf + r_m(d))",
+      "where r_m(d) is the rank of document d in ranking method m (with ranks starting at 1), and k_rrf is a smoothing constant typically set to 60."
+    ],
+    "reference_answer": "Reciprocal Rank Fusion computes RRF_Score(d) = sum_{m in M} 1 / (k_rrf + r_m(d)), where r_m(d) is the document's rank in ranking method m starting at 1, and k_rrf is a smoothing constant typically set to 60.",
+    "expected_behavior": "Direct factual extraction from DOC-03.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q09",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What are the four reflection tokens emitted by the Self-RAG generator, and what does each token signify?",
+    "target_documents": [
+      "doc_03_comparative_baselines.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_03_comparative_baselines_c05",
+      "doc_03_comparative_baselines_c06"
+    ],
+    "ground_truth_global_indices": [
+      32,
+      33
+    ],
+    "exact_evidence_spans": [
+      "- [Retrieve]: emitted when external knowledge is required to answer the query.\n- [IsRel]: evaluates whether the retrieved passage is relevant to the prompt.\n- [IsSup]: evaluates whether the generated output is fully supported by the retrieved context.\n- [IsUse]: assesses the overall utility and informativeness of the generated response."
+    ],
+    "reference_answer": "The four reflection tokens are: [Retrieve] (emitted when external knowledge is required), [IsRel] (evaluates if retrieved passage is relevant), [IsSup] (evaluates if generated output is fully supported by context), and [IsUse] (assesses overall utility and informativeness).",
+    "expected_behavior": "Direct factual extraction from DOC-03.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q10",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What is the measured retrieval latency for IndexFlatL2 on an Intel Xeon CPU at 10,000 vectors versus 100,000 vectors for k=8?",
+    "target_documents": [
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_04_hardware_latency_c00",
+      "doc_04_hardware_latency_c01"
+    ],
+    "ground_truth_global_indices": [
+      39,
+      40
+    ],
+    "exact_evidence_spans": [
+      "- At 10,000 vectors: Retrieval latency averages 0.420 milliseconds for k=8.\n- At 100,000 vectors: Retrieval latency scales linearly to 3.850 milliseconds for k=8."
+    ],
+    "reference_answer": "At 10,000 vectors, retrieval latency averages 0.420 milliseconds for k=8, whereas at 100,000 vectors, it scales linearly to 3.850 milliseconds on the Intel Xeon CPU.",
+    "expected_behavior": "Direct factual extraction from DOC-04.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q11",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "How much RAM is required for 100,000 vectors under exact IndexFlatL2 compared to IndexIVF1024_PQ32?",
+    "target_documents": [
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_04_hardware_latency_c01",
+      "doc_04_hardware_latency_c02"
+    ],
+    "ground_truth_global_indices": [
+      40,
+      41
+    ],
+    "exact_evidence_spans": [
+      "Memory consumption for 100,000 vectors at 384 dimensions with 4-byte float32 elements equals exactly 153.6 megabytes of RAM.",
+      "Memory footprint for 100,000 vectors drops from 153.6 MB down to 19.2 MB."
+    ],
+    "reference_answer": "Exact IndexFlatL2 requires 153.6 megabytes of RAM for 100,000 vectors, whereas IndexIVF1024_PQ32 reduces the memory footprint to 19.2 megabytes (an 87.5% reduction).",
+    "expected_behavior": "Direct factual extraction from DOC-04.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q12",
+    "category": "sufficient_single",
+    "split": "test",
+    "question": "What are the token pricing rates for input context and output generation under the Gemini flash-lite tier used in VISTAAR?",
+    "target_documents": [
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_04_hardware_latency_c05"
+    ],
+    "ground_truth_global_indices": [
+      44
+    ],
+    "exact_evidence_spans": [
+      "- Input context prompt pricing: $0.075 per 1,000,000 tokens.\n- Output generation pricing: $0.300 per 1,000,000 tokens."
+    ],
+    "reference_answer": "Under the Gemini flash-lite tier, input context prompt pricing is $0.075 per 1,000,000 tokens, and output generation pricing is $0.300 per 1,000,000 tokens.",
+    "expected_behavior": "Direct factual extraction from DOC-04.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q13",
+    "category": "sufficient_multi",
+    "split": "test",
+    "question": "Compare the vector embedding dimensionality of VISTAAR's baseline embedding model with the dimensionality of the Dense Passage Retrieval (DPR) baseline.",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt",
+      "doc_03_comparative_baselines.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c03",
+      "doc_01_vistaar_architecture_c04",
+      "doc_03_comparative_baselines_c00"
+    ],
+    "ground_truth_global_indices": [
+      3,
+      4,
+      27
+    ],
+    "exact_evidence_spans": [
+      "Vector dimensionality: 384 dimensions",
+      "In DPR, two independent BERT-base encoders are trained: a question encoder that maps questions to 768-dimensional vectors, and a passage encoder that maps document passages to the same 768-dimensional space."
+    ],
+    "reference_answer": "VISTAAR's baseline all-MiniLM-L6-v2 embedding model utilizes 384-dimensional vectors, whereas the Dense Passage Retrieval (DPR) baseline maps questions and passages to 768-dimensional vectors.",
+    "expected_behavior": "Synthesize dimensionality metrics from DOC-01 and DOC-03.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q15",
+    "category": "sufficient_multi",
+    "split": "test",
+    "question": "What is the memory footprint for 100,000 vectors in VISTAAR's baseline FAISS IndexFlatL2, and what percentage of total end-to-end latency does vector search account for?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt",
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c05",
+      "doc_04_hardware_latency_c01",
+      "doc_04_hardware_latency_c05",
+      "doc_04_hardware_latency_c06"
+    ],
+    "ground_truth_global_indices": [
+      5,
+      40,
+      44,
+      45
+    ],
+    "exact_evidence_spans": [
+      "The baseline implementation initializes an in-memory index using faiss.IndexFlatL2 with dimension 384.",
+      "Memory consumption for 100,000 vectors at 384 dimensions with 4-byte float32 elements equals exactly 153.6 megabytes of RAM.",
+      "Vector search via IndexFlatL2 accounts for less than 0.2% of total transaction time."
+    ],
+    "reference_answer": "For 100,000 vectors at 384 dimensions, VISTAAR's IndexFlatL2 requires exactly 153.6 megabytes of RAM, and vector search accounts for less than 0.2% of total end-to-end transaction latency.",
+    "expected_behavior": "Synthesize memory footprint and latency share from DOC-01 and DOC-04.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q16",
+    "category": "sufficient_multi",
+    "split": "test",
+    "question": "How are tabular structures extracted from documents in VISTAAR, and what chunking parameters are subsequently applied to the extracted Markdown tables?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt",
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c03",
+      "doc_02_multimodal_indic_c04",
+      "doc_01_vistaar_architecture_c02"
+    ],
+    "ground_truth_global_indices": [
+      18,
+      19,
+      2
+    ],
+    "exact_evidence_spans": [
+      "Horizontal morphological kernels (size 1x40 pixels) detect horizontal table ruling lines, while vertical kernels (size 40x1 pixels) detect column dividers. The intersection of detected lines defines individual tabular grid cells. Once table geometry is resolved, cell contents are extracted and reformatted into standardized Markdown table syntax prior to sliding-window chunking.",
+      "the baseline VISTAAR implementation uses a deterministic character-level sliding-window protocol with fixed parameters:\n- Window size: 1000 characters\n- Overlap size: 200 characters\n- Stride: 800 characters"
+    ],
+    "reference_answer": "Tables are detected using horizontal (1x40 pixel) and vertical (40x1 pixel) morphological kernels to locate ruling lines, cell contents are extracted into standardized Markdown table syntax, and the resulting Markdown text is processed by VISTAAR's sliding-window chunker with a 1000-character window, 200-character overlap, and 800-character stride.",
+    "expected_behavior": "Synthesize table extraction in DOC-02 with chunking parameters in DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q17",
+    "category": "sufficient_multi",
+    "split": "test",
+    "question": "What is the Word Error Rate threshold for speech transcripts in VISTAAR, and what token limit does the baseline embedding model enforce on chunk inputs?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt",
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c05",
+      "doc_01_vistaar_architecture_c04"
+    ],
+    "ground_truth_global_indices": [
+      20,
+      4
+    ],
+    "exact_evidence_spans": [
+      "An automated Word Error Rate (WER) filtering gate discards audio segments exhibiting estimated transcript perplexity exceeding 18.5%.",
+      "Input sequence limit: 256 wordpiece tokens"
+    ],
+    "reference_answer": "The speech transcript filtering gate discards audio segments with estimated transcript perplexity/WER exceeding 18.5%, while the baseline embedding model enforces an input sequence limit of 256 wordpiece tokens.",
+    "expected_behavior": "Synthesize WER threshold from DOC-02 and sequence token limit from DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q19",
+    "category": "sufficient_multi",
+    "split": "test",
+    "question": "Which component dominates end-to-end transaction latency in VISTAAR, and what is its measured Time-to-First-Token (TTFT) and token generation rate?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt",
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_04_hardware_latency_c06",
+      "doc_04_hardware_latency_c04"
+    ],
+    "ground_truth_global_indices": [
+      45,
+      43
+    ],
+    "exact_evidence_spans": [
+      "Gemini API network round-trip and autoregressive token decoding accounts for 94.8% to 96.3% of total transaction wall-clock time.",
+      "Time-to-First-Token (TTFT): Averages 420 milliseconds under stable network conditions.\n- Generation decoding throughput: 68 tokens per second."
+    ],
+    "reference_answer": "The Gemini API network round-trip and autoregressive token decoding dominates end-to-end latency (accounting for 94.8% to 96.3% of wall-clock time), with a measured Time-to-First-Token (TTFT) averaging 420 milliseconds and a decoding throughput of 68 tokens per second.",
+    "expected_behavior": "Synthesize system bottleneck and LLM latency profiling from DOC-04 and DOC-01.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q20",
+    "category": "sufficient_multi",
+    "split": "test",
+    "question": "What is the recall penalty when replacing VISTAAR's exact IndexFlatL2 with IndexIVF1024_PQ32, and how does INT8 quantization affect all-MiniLM-L6-v2 throughput on CPU?",
+    "target_documents": [
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_04_hardware_latency_c02",
+      "doc_04_hardware_latency_c03"
+    ],
+    "ground_truth_global_indices": [
+      41,
+      42
+    ],
+    "exact_evidence_spans": [
+      "Recall@10 drops by 4.2% relative to exact IndexFlatL2 due to quantization noise and boundary truncation.",
+      "On Intel Xeon CPU with INT8 dynamic quantization via ONNX Runtime: Throughput increases to 780 sentences per second, reducing inference latency to 41.0 milliseconds per batch. Cosine similarity drift between FP32 and INT8 embeddings remains below 0.003"
+    ],
+    "reference_answer": "Replacing IndexFlatL2 with IndexIVF1024_PQ32 incurs a 4.2% drop in Recall@10, while applying INT8 dynamic quantization to all-MiniLM-L6-v2 on CPU increases throughput from 412 to 780 sentences per second with cosine similarity drift remaining below 0.003.",
+    "expected_behavior": "Synthesize index recall trade-off and embedding quantization benchmarks from DOC-04.",
+    "refusal_expected": false,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q21",
+    "category": "partial",
+    "split": "test",
+    "question": "What is VISTAAR's sliding window chunk size and stride, and what is its specific maximum sentence length threshold?",
+    "target_documents": [
+      "doc_01_vistaar_architecture.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_01_vistaar_architecture_c02"
+    ],
+    "ground_truth_global_indices": [
+      2
+    ],
+    "exact_evidence_spans": [
+      "Window size: 1000 characters\n- Overlap size: 200 characters\n- Stride: 800 characters"
+    ],
+    "reference_answer": "VISTAAR uses a window size of 1000 characters and a step stride of 800 characters (with 200 characters overlap). However, the provided context does not contain any information regarding a maximum sentence length threshold, as VISTAAR uses character-level sliding-window chunking rather than sentence-based splitting.",
+    "expected_behavior": "Answer chunk size and stride factually; explicitly state that the sentence length threshold is absent from the context.",
+    "refusal_expected": "partial",
+    "partial_scope": {
+      "supported": "Window size is 1000 characters and stride is 800 characters (200 characters overlap).",
+      "unsupported": "Maximum sentence length threshold (VISTAAR does not use sentence-based splitting)."
+    }
+  },
+  {
+    "question_id": "PH2-Q23",
+    "category": "partial",
+    "split": "test",
+    "question": "What OCR confidence threshold does VISTAAR use for text filtering, and what GPU cluster model was used to train Tesseract 5.3?",
+    "target_documents": [
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c02",
+      "doc_02_multimodal_indic_c03"
+    ],
+    "ground_truth_global_indices": [
+      17,
+      18
+    ],
+    "exact_evidence_spans": [
+      "A confidence threshold filter of 72.0% is applied: words recognized with confidence below 72.0% are flagged with an uncertainty marker"
+    ],
+    "reference_answer": "VISTAAR applies an OCR confidence threshold filter of 72.0%, flagging words recognized below this score with an uncertainty marker. However, the provided context does not mention the GPU cluster model used to train Tesseract 5.3.",
+    "expected_behavior": "Answer OCR confidence threshold; refuse GPU cluster training details.",
+    "refusal_expected": "partial",
+    "partial_scope": {
+      "supported": "OCR confidence threshold is 72.0%.",
+      "unsupported": "GPU cluster model used to train Tesseract 5.3."
+    }
+  },
+  {
+    "question_id": "PH2-Q25",
+    "category": "partial",
+    "split": "test",
+    "question": "What is the retrieval latency for 10,000 vectors on Intel Xeon CPU for k=8, and what is the exact server rack power consumption in Watts?",
+    "target_documents": [
+      "doc_04_hardware_latency.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_04_hardware_latency_c00",
+      "doc_04_hardware_latency_c01"
+    ],
+    "ground_truth_global_indices": [
+      39,
+      40
+    ],
+    "exact_evidence_spans": [
+      "- At 10,000 vectors: Retrieval latency averages 0.420 milliseconds for k=8."
+    ],
+    "reference_answer": "For 10,000 vectors on an Intel Xeon CPU, IndexFlatL2 retrieval latency averages 0.420 milliseconds for k=8. However, the provided context does not provide information regarding server rack power consumption in Watts.",
+    "expected_behavior": "Answer retrieval latency; refuse server rack power consumption.",
+    "refusal_expected": "partial",
+    "partial_scope": {
+      "supported": "Retrieval latency is 0.420 milliseconds for 10,000 vectors at k=8.",
+      "unsupported": "Server rack power consumption in Watts."
+    }
+  },
+  {
+    "question_id": "PH2-Q26",
+    "category": "partial",
+    "split": "test",
+    "question": "What sampling rate standards are supported by VISTAAR's audio ingestion module, and who was the primary recording engineer for the speech dataset?",
+    "target_documents": [
+      "doc_02_multimodal_indic.txt"
+    ],
+    "ground_truth_chunk_ids": [
+      "doc_02_multimodal_indic_c04",
+      "doc_02_multimodal_indic_c05"
+    ],
+    "ground_truth_global_indices": [
+      19,
+      20
+    ],
+    "exact_evidence_spans": [
+      "The speech subsystem handles single-channel audio recorded at sampling rates between 8 kHz and 48 kHz, standardized to 16 kHz 16-bit PCM format."
+    ],
+    "reference_answer": "VISTAAR's audio ingestion module supports single-channel audio recorded at sampling rates between 8 kHz and 48 kHz, standardized to 16 kHz 16-bit PCM format. However, the context does not state who the primary recording engineer was for the speech dataset.",
+    "expected_behavior": "Answer audio sampling rate standards; refuse identity of the recording engineer.",
+    "refusal_expected": "partial",
+    "partial_scope": {
+      "supported": "Supported sampling rates are between 8 kHz and 48 kHz, standardized to 16 kHz 16-bit PCM format.",
+      "unsupported": "Primary recording engineer identity."
+    }
+  },
+  {
+    "question_id": "PH2-Q27",
+    "category": "insufficient",
+    "split": "test",
+    "question": "What is the recommended hyperparameter configuration for training a vision transformer using AdamW optimizer in VISTAAR?",
+    "target_documents": [],
+    "ground_truth_chunk_ids": [],
+    "ground_truth_global_indices": [],
+    "exact_evidence_spans": [],
+    "reference_answer": "The provided context does not contain sufficient information to answer this question.",
+    "expected_behavior": "Complete refusal: VISTAAR corpus contains no mention of vision transformer training or AdamW hyperparameters.",
+    "refusal_expected": true,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q29",
+    "category": "insufficient",
+    "split": "test",
+    "question": "What are the names and affiliations of the software engineers who implemented VISTAAR's frontend user interface in React?",
+    "target_documents": [],
+    "ground_truth_chunk_ids": [],
+    "ground_truth_global_indices": [],
+    "exact_evidence_spans": [],
+    "reference_answer": "The provided context does not contain sufficient information to answer this question.",
+    "expected_behavior": "Complete refusal: VISTAAR corpus contains no personnel names, affiliations, or React frontend implementation details.",
+    "refusal_expected": true,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q30",
+    "category": "insufficient",
+    "split": "test",
+    "question": "What is the exact mathematical equation used by VISTAAR to calculate Kalman filter gain when updating text chunk vectors?",
+    "target_documents": [
+      "doc_05_acoustic_distractor.txt"
+    ],
+    "ground_truth_chunk_ids": [],
+    "ground_truth_global_indices": [],
+    "exact_evidence_spans": [],
+    "reference_answer": "The provided context does not contain sufficient information to answer this question. While the context describes Kalman filtering for acoustic signals and state estimation, VISTAAR does not use Kalman filters to update text chunk vectors.",
+    "expected_behavior": "Complete refusal / distinction: VISTAAR does not use Kalman filtering on text chunks; the equation in DOC-05 is purely for acoustic state estimation.",
+    "refusal_expected": true,
+    "partial_scope": null
+  },
+  {
+    "question_id": "PH2-Q32",
+    "category": "insufficient",
+    "split": "test",
+    "question": "What order Butterworth filter does VISTAAR use to remove high-frequency noise from PDF text tokens before FAISS indexing?",
+    "target_documents": [
+      "doc_05_acoustic_distractor.txt"
+    ],
+    "ground_truth_chunk_ids": [],
+    "ground_truth_global_indices": [],
+    "exact_evidence_spans": [],
+    "reference_answer": "The provided context does not contain sufficient information to answer this question. Butterworth low-pass filters are described in the context only for analog-to-digital signal conversion of continuous acoustic signals, not for filtering PDF text tokens.",
+    "expected_behavior": "Complete refusal / distractor rejection: Reject misleading combination of Butterworth analog filters with PDF text token processing.",
+    "refusal_expected": true,
+    "partial_scope": null
+  }
+]

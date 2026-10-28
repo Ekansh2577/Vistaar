@@ -1,0 +1,152 @@
+[
+  {
+    "id": "Q01",
+    "category": "sufficient_evidence",
+    "user_input": "What chunk size is configured for text partitioning in VISTAAR?",
+    "reference": "Text is partitioned into overlapping chunks of 1000 characters."
+  },
+  {
+    "id": "Q02",
+    "category": "sufficient_evidence",
+    "user_input": "What is the character overlap between adjacent text chunks?",
+    "reference": "The configured character overlap between adjacent chunks is 200 characters."
+  },
+  {
+    "id": "Q03",
+    "category": "sufficient_evidence",
+    "user_input": "Which transformer model is used to generate dense embeddings in VISTAAR?",
+    "reference": "Dense embeddings are generated using the all-MiniLM-L6-v2 transformer model."
+  },
+  {
+    "id": "Q04",
+    "category": "sufficient_evidence",
+    "user_input": "How many dimensions do the generated embeddings have?",
+    "reference": "The generated embeddings have 384 dimensions."
+  },
+  {
+    "id": "Q05",
+    "category": "sufficient_evidence",
+    "user_input": "What type of FAISS index is used to store document vector representations?",
+    "reference": "Vector representations are stored in a FAISS IndexFlatL2 index."
+  },
+  {
+    "id": "Q06",
+    "category": "sufficient_evidence",
+    "user_input": "What distance metric does the FAISS index compute during similarity search?",
+    "reference": "The FAISS IndexFlatL2 index performs exact Euclidean distance search."
+  },
+  {
+    "id": "Q07",
+    "category": "sufficient_evidence",
+    "user_input": "How many top semantic chunks are retrieved when a user submits a query?",
+    "reference": "VISTAAR retrieves the top-8 most similar semantic chunks for each query."
+  },
+  {
+    "id": "Q08",
+    "category": "sufficient_evidence",
+    "user_input": "What temperature parameter is used when passing the prompt to the Gemini model?",
+    "reference": "The prompt is passed to the Gemini model with the temperature set to 0.0."
+  },
+  {
+    "id": "Q09",
+    "category": "sufficient_evidence",
+    "user_input": "What exact message does the model return when context does not contain the answer?",
+    "reference": "The model responds with: 'I could not find this in the document.'"
+  },
+  {
+    "id": "Q10",
+    "category": "sufficient_evidence",
+    "user_input": "What is the rate limit for the document upload endpoint?",
+    "reference": "The upload endpoint is rate limited to 5 requests per minute."
+  },
+  {
+    "id": "Q11",
+    "category": "sufficient_evidence",
+    "user_input": "What is the rate limit configured for the question answering endpoint?",
+    "reference": "The question answering endpoint is rate limited to 10 requests per minute."
+  },
+  {
+    "id": "Q12",
+    "category": "sufficient_evidence",
+    "user_input": "What is the minimum character threshold for uploaded documents to be accepted?",
+    "reference": "Documents with less than 50 characters of readable text are rejected during ingestion."
+  },
+  {
+    "id": "Q13",
+    "category": "partial_evidence",
+    "user_input": "Does VISTAAR use sentence-transformers, and what specific GPU acceleration does it require?",
+    "reference": "VISTAAR uses the all-MiniLM-L6-v2 transformer model for embeddings, but the document does not specify GPU acceleration requirements."
+  },
+  {
+    "id": "Q14",
+    "category": "partial_evidence",
+    "user_input": "How is document text extracted page by page, and does it include Tesseract OCR?",
+    "reference": "Text is extracted page by page from uploaded documents, but the document does not mention Tesseract OCR support."
+  },
+  {
+    "id": "Q15",
+    "category": "partial_evidence",
+    "user_input": "What distance metric is used by FAISS and what is its mathematical formula?",
+    "reference": "The FAISS index uses exact Euclidean distance search, but the document does not write out the mathematical formula."
+  },
+  {
+    "id": "Q16",
+    "category": "partial_evidence",
+    "user_input": "How are prompt templates constructed and what is the full verbatim system prompt for Gemini?",
+    "reference": "Retrieved chunks are synthesized into a strict prompt template for Gemini, but the document does not provide the full verbatim system prompt."
+  },
+  {
+    "id": "Q17",
+    "category": "partial_evidence",
+    "user_input": "What happens when a user asks a question before any document has been uploaded?",
+    "reference": "The document specifies that questions are answered using retrieved context, but does not detail the exact pre-upload error string."
+  },
+  {
+    "id": "Q18",
+    "category": "partial_evidence",
+    "user_input": "What file formats can be uploaded to VISTAAR for document question answering?",
+    "reference": "The document states that documents are uploaded and processed page by page, but does not list all specific file extensions."
+  },
+  {
+    "id": "Q19",
+    "category": "partial_evidence",
+    "user_input": "Why is the temperature set to 0.0 and what sampling algorithm is used?",
+    "reference": "The temperature is configured at 0.0 for deterministic output, but the specific sampling algorithm is not elaborated."
+  },
+  {
+    "id": "Q20",
+    "category": "insufficient_evidence",
+    "user_input": "What is the monthly pricing tier for VISTAAR enterprise license?",
+    "reference": "I could not find this in the document."
+  },
+  {
+    "id": "Q21",
+    "category": "insufficient_evidence",
+    "user_input": "What is the warranty and return policy for agricultural drones?",
+    "reference": "I could not find this in the document."
+  },
+  {
+    "id": "Q22",
+    "category": "insufficient_evidence",
+    "user_input": "What are the clinical diagnostic criteria for type 2 diabetes?",
+    "reference": "I could not find this in the document."
+  },
+  {
+    "id": "Q23",
+    "category": "insufficient_evidence",
+    "user_input": "How do you deploy VISTAAR on an Amazon EKS Kubernetes cluster?",
+    "reference": "I could not find this in the document."
+  },
+  {
+    "id": "Q24",
+    "category": "insufficient_evidence",
+    "user_input": "What training dataset was used to pre-train the Gemini 3 Flash model?",
+    "reference": "I could not find this in the document."
+  },
+  {
+    "id": "Q25",
+    "category": "insufficient_evidence",
+    "user_input": "How does VISTAAR compute ROUGE-L and BLEU scores for evaluation?",
+    "reference": "I could not find this in the document."
+  }
+]

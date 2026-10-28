@@ -1,0 +1,7 @@
+group,total_questions,faithfulness_factual_n,faithfulness_factual_mean,faithfulness_factual_std,faithfulness_policy_mean,answer_relevancy_n,answer_relevancy_mean,answer_relevancy_std,context_precision_n,context_precision_mean,context_precision_std,context_recall_factual_n,context_recall_factual_mean,context_recall_factual_std,context_recall_policy_mean
+Overall (All 25 Questions),25,12,1.0,0.0,1.0,25,0.4239,0.3039,25,0.96,0.1384,18,0.9444,0.1617,0.96
+Category: sufficient_evidence,12,11,1.0,0.0,1.0,12,0.6796,0.185,12,0.9167,0.1946,11,1.0,0.0,1.0
+Category: partial_evidence,7,1,1.0,0.0,1.0,7,0.2556,0.2086,7,1.0,0.0,7,0.8571,0.244,0.8571
+Category: insufficient_evidence,6,0,,,1.0,6,0.109,0.0189,6,1.0,0.0,0,,,1.0
+Subset: Factual Answers (Claims > 0),12,12,1.0,0.0,1.0,12,0.7204,0.1163,12,0.9167,0.1946,12,1.0,0.0,1.0
+Subset: Pure Refusals (Zero Claims),13,0,,,1.0,13,0.1502,0.0575,13,1.0,0.0,6,0.8333,0.2582,0.9231

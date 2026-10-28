@@ -1,0 +1,80 @@
+﻿question_id,category,question,reference_answer,model_used,retrieved_sources,answer,is_refusal,api_failure,error_category,latency_s
+Q01,Dsa.pdf,What are the two authors named on the title page?,Granville Barnett and Luca Del Tongo,gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | spring_boot_tutorial.pdf | Dsa.pdf | css.pdf,Granville Barnett and Luca Del Tongo,False,False,none,7.422
+Q02,Dsa.pdf,Which data structure chapters are listed before sorting?,"Linked Lists, Binary Search Tree, Heap, Sets, Queues, and AVL Tree",gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,"Based on the document provided, the data structure chapters listed before Chapter 8 (Sorting) are:
+
+*   **Chapter 3:** Binary search tree (referenced as being defined in x3).
+*   **Chapter 5:** Sets.",False,False,none,180.282
+Q03,Dsa.pdf,Which four tree traversal methods are listed for a binary search tree?,"Preorder, Postorder, Inorder, and Breadth First",gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,I could not find this in the document.,True,False,none,187.861
+Q04,Dsa.pdf,Which sorting algorithms are covered in the sorting chapter?,"Bubble, Merge, Quick, Insertion, Shell, and Radix Sort",gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,"Based on the document, the sorting algorithms covered in the sorting chapter are:
+
+*   **Bubble Sort** (Section 8.1)
+*   **Merge Sort** (Section 8.2)
+*   **Quick Sort** (Section 8.3)
+*   **Insertion Sort** (Section 8.4)
+*   **Shell Sort** (Section 8.5)
+*   **Radix Sort** (Figure 8.6)",False,False,none,4.113
+Q05,Dsa.pdf,What topics are included in the numeric algorithms chapter?,"Primality testing, base conversions, greatest common denominator, maximum value for a base with N digits, and factorial",gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,"Based on the document, the numeric algorithms chapter (Chapter 9) includes:
+
+*   **Factorial algorithm:** An algorithm to compute the factorial of a number ($n!$).
+*   **Several numeric algorithms:** The summary notes the chapter presents several numeric algorithms that were ""fun to design.""
+*   **Applications:** The chapter discusses how numeric algorithms are applied to domains such as computing data for weather forecasts.",False,False,none,5.221
+Q06,Dsa.pdf,What is the title of Appendix D?,Testing,gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,Testing,False,False,none,3.554
+Q07,Dsa.pdf,What complexity considerations does the preface say are key when selecting a data structure or algorithm?,Run time complexity and space requirements,gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,It is absolutely key that you think about the run time complexity and space requirements of your selected approach.,False,False,none,3.372
+Q08,Dsa.pdf,Which programming languages are mentioned as targets for porting the pseudocode?,"C++, C#, and Java",gemini-3-flash-preview,Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf | Dsa.pdf,"The programming languages mentioned as targets for porting the pseudocode are C++, C#, and Java.",False,False,none,3.123
+Q09,Spring Boot Tutorial.pdf,What is Spring Boot described as being used to create?,"Standalone, production-ready Spring applications and microservices",gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,Spring Boot is described as being used to create a Micro Service.,False,False,none,3.38
+Q10,Spring Boot Tutorial.pdf,What are the stated goals of Spring Boot?,"Avoid complex XML configuration, make production-ready apps easier, reduce development time, and simplify getting started",gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,"Spring Boot is designed with the following goals:  
+* To avoid complex XML configuration in Spring  
+* To develop a production ready Spring applications in an easier way  
+* To reduce the development time and run the application independently  
+* Offer an easier way of getting started with the application",False,False,none,4.636
+Q11,Spring Boot Tutorial.pdf,Which annotation is described as the entry point marker for a Spring Boot application?,@SpringBootApplication,gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,The entry point of the Spring Boot Application is the class that contains the @SpringBootApplication annotation.,False,False,none,3.474
+Q12,Spring Boot Tutorial.pdf,Which three capabilities are included by @SpringBootApplication according to the tutorial?,"Auto-Configuration, Component Scan, and Spring Boot Configuration",gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,"The @SpringBootApplication annotation includes the following three capabilities:
+*   Auto-Configuration
+*   Component Scan
+*   Spring Boot Configuration",False,False,none,3.656
+Q13,Spring Boot Tutorial.pdf,What naming pattern do Spring Boot starter dependencies follow?,spring-boot-starter-*,gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,"Spring Boot starters follow the same naming pattern spring -boot-starter- *, where * indicates that it is a type of the application.",False,False,none,2.988
+Q14,Spring Boot Tutorial.pdf,Which starter is listed for writing REST endpoints?,spring-boot-starter-web,gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,Spring Boot Starter web dependency is used to write a Rest Endpoints.,False,False,none,3.199
+Q15,Spring Boot Tutorial.pdf,Which HTTP operations are covered in the RESTful web services section?,"GET, POST, PUT, and DELETE",gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,"Based on the document provided, the following HTTP operations are covered:
+
+*   **GET:** Mentioned as the default request method for the `@RequestMapping` annotation.
+*   **POST:** Shown in the `createProduct` example using `RequestMethod.POST`.
+*   **PUT:** Described in the ""PUT API"" section as being used to update an existing resource.",False,False,none,4.564
+Q16,Spring Boot Tutorial.pdf,Which database options are mentioned in the database handling chapter?,"H2, MySQL, and Redis",gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | Dsa.pdf | Dsa.pdf | spring_boot_tutorial.pdf,"Based on the document, the database options mentioned in the ""SPRING BOOT – DATABASE HANDLING"" chapter are:
+*   H2 database
+*   MySQL
+*   Redis",False,False,none,5.842
+Q17,Spring Boot Tutorial.pdf,Which tools or topics are listed for unit testing Spring Boot applications?,Mockito and REST controller unit tests,gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf,"Based on the provided document, the tools and topics listed for unit testing Spring Boot applications include:
+
+*   **Spring Boot Starter Test dependency:** Required in the build configuration (Maven or Gradle).
+*   **SpringJUnit4ClassRunner and MockMvc:** Used to create a web application context for testing Rest Controllers.
+*   **Mockito:** Used for mocking services (e.g., `Mockito.mock(ProductService.class)`).
+*   **JUnit:** Referenced through imports such as `org.junit.Assert` and `org.junit.Test`.
+*   **Directories:** `src/test/java` for unit tests and `src/test/resources` for classpath resources.
+*   **Annotations:** `@Profile(""test"")`, `@SpringBootTest`, `@ActiveProfiles(""test"")`, `@Bean`, `@Primary`, and `@Configuration`.
+*   **Build Tools:** Maven (using `mvn clean install`) and Gradle (using `gradle clean build`) to run applications and see test results in the console.
+*   **Topics:** Writing Unit Tests for REST Controllers and configuring the Application context for tests.",False,False,none,5.926
+Q18,Spring Boot Tutorial.pdf,Which security topics are covered near the end of the tutorial?,Securing web applications and OAuth2 with JWT,gemini-3-flash-preview,spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | spring_boot_tutorial.pdf | Dsa.pdf,I could not find this in the document.,True,False,none,198.523
+Q19,css.pdf,What does CSS stand for in the uploaded notes?,Cascading Style Sheet,gemini-3-flash-preview,css.pdf | css.pdf | css.pdf | css.pdf | css.pdf,Cascading Style Sheet,False,False,none,7.069
+Q20,css.pdf,What are the three types of stylesheets listed in the notes?,"Inline, Internal, and External stylesheets",gemini-3-flash-preview,css.pdf | css.pdf | css.pdf | css.pdf | css.pdf,"The three types of stylesheets listed in the document are:
+1. Inline stylesheet
+2. Internal stylesheet
+3. External stylesheet",False,False,none,2.574
+Q21,css.pdf,Which CSS properties are listed under text designing properties?,"color, text-align, font-size, font-family, font-weight, font-style, text-transform, letter-spacing, word-spacing, line-height, and text-indent",gemini-3-flash-preview,css.pdf | css.pdf | css.pdf | css.pdf | css.pdf,"The CSS properties listed under text designing properties are:
+
+*   color
+*   text -align
+*   font -size
+*   font -family
+*   font -weight
+*   font -style
+*   text -transform
+*   letter -spacing
+*   word -spacing
+*   line-height
+*   text -indent",False,False,none,3.451
+Q22,css.pdf,Which selectors are explained in the CSS selector chapter?,"Element, ID, and Class selectors",gemini-3-flash-preview,css.pdf | css.pdf | css.pdf | css.pdf | css.pdf,"Based on the document, the selectors explained in Chapter 6 (CSS2 Selectors) are:
+
+1. Element Selector
+2. Id Selector
+3. Class Selector",False,False,none,3.417
+Q23,css.pdf,Which CSS properties are listed as dimensional properties?,"width, height, border-width, border-style, border-color, float, padding, and margin variants",gemini-3-flash-preview,css.pdf | css.pdf | css.pdf | css.pdf | css.pdf,,False,True,quota_exhausted,3.648

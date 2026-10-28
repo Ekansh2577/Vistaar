@@ -1,0 +1,17 @@
+# ==============================================================================
+# VISTAAR Evaluation-Only Dependencies
+# ==============================================================================
+# These dependencies are strictly isolated for the evaluation module.
+# The core VISTAAR backend and frontend runtime DO NOT depend on these packages.
+#
+# To install in an isolated evaluation environment:
+#   python -m venv evaluation/eval_venv
+#   .\evaluation\eval_venv\Scripts\activate
+#   pip install -r evaluation/requirements.txt
+# ==============================================================================
+
+ragas>=0.2.0
+langchain-google-genai>=2.0.0
+datasets>=2.19.0
+pandas>=2.0.0
+python-dotenv>=1.0.0

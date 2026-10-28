@@ -1,3 +1,17 @@
-﻿Write-Host "Starting VISTAAR Backend..." -ForegroundColor Cyan
+Write-Host "Starting VISTAAR Backend..." -ForegroundColor Cyan
 $backendDir = Join-Path $PSScriptRoot "backend"
-& "C:\Users\ekans\OneDrive\New folder\vis\Vistaar-main\backend\venv\Scripts\python.exe" -c "import os, sys, uvicorn; os.chdir(r'$backendDir'); sys.path.insert(0, os.getcwd()); uvicorn.run('app:app', host='127.0.0.1', port=8000)"
+$backendPython = Join-Path $backendDir "venv\Scripts\python.exe"
+if (-not (Test-Path $backendPython)) {
+  $pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+  if (-not $pythonCommand) {
+    throw "Python was not found. Install Python or create backend\venv, then install backend\requirements.txt."
+  }
+  $backendPython = $pythonCommand.Source
+}
+
+Push-Location $backendDir
+try {
+  & $backendPython -m uvicorn app:app --host 127.0.0.1 --port 8000
+} finally {
+  Pop-Location
+}

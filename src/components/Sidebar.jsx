@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   Home, BookOpen, MessageSquare, Compass, GitBranch, BarChart3,
   Settings, BookOpenCheck, X
@@ -7,6 +7,7 @@ import { useApp } from '../context/AppContext'
 import { useTheme } from '../context/ThemeContext'
 import ThemeToggle from './ThemeToggle'
 import BeyondVistaarCapsule from './BeyondVistaarCapsule'
+import { useAuth } from '../context/AuthContext'
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
@@ -19,8 +20,10 @@ const navItems = [
 ]
 
 export default function Sidebar() {
-  const { sidebarOpen, closeSidebar } = useApp()
+  const { sidebarOpen, closeSidebar, addToast } = useApp()
   const { isEnlighten } = useTheme()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -101,12 +104,20 @@ export default function Sidebar() {
                   : 'linear-gradient(135deg, #5b21b6, #3730a3)',
               }}
             >
-              EK
+                {(user?.fullName || user?.email || 'U').split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase()}
             </div>
             <div className="sidebar-user-info">
-              <div className="sidebar-user-name">Ekansh</div>
-              <div className="sidebar-user-email">ekansh@vistaar.ai</div>
+              <div className="sidebar-user-name">{user?.fullName || 'VISTAAR user'}</div>
+              <div className="sidebar-user-email">{user?.email}</div>
             </div>
+            <button className="sidebar-logout" type="button" aria-label="Log out" title="Log out" onClick={async () => {
+              try {
+                await logout()
+                navigate('/login', { replace: true })
+              } catch (error) {
+                addToast(error.message, 'error')
+              }
+            }}>Log out</button>
           </div>
         </div>
       </aside>
